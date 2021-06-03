@@ -1,4 +1,4 @@
-import {useState} from "react"
+import { useState } from "react";
 
 import Image from "next/image";
 
@@ -10,23 +10,20 @@ import SearchIcon from "@material-ui/icons/Search";
 import InputBase from "@material-ui/core/InputBase";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import NotificationsNoneIcon from "@material-ui/icons/NotificationsNone";
-import MenuIcon from '@material-ui/icons/Menu';
-import Menu from '@material-ui/core/Menu';
-import MenuItem from '@material-ui/core/MenuItem';
-import Fade from '@material-ui/core/Fade';
+import MenuIcon from "@material-ui/icons/Menu";
+import Menu from "@material-ui/core/Menu";
+import MenuItem from "@material-ui/core/MenuItem";
+import Fade from "@material-ui/core/Fade";
 
 const useStyles = makeStyles((theme) => ({
   main: {
-    padding: "1em 3em",
+    paddingLeft: "3em",
+    paddingRight: "3em",
     backgroundColor: theme.palette.common.backgroundDark,
-    height: "90px",
-    [theme.breakpoints.down("md")]: {
-      height: "80px",
-    },
+    height: "10vh",
     [theme.breakpoints.down("xs")]: {
       padding: "1em 2em",
     },
-    
   },
   search: {
     position: "relative",
@@ -86,46 +83,45 @@ const useStyles = makeStyles((theme) => ({
   },
   btnRoot: {
     textTransform: "none",
-    minWidth:0
+    minWidth: 0,
   },
   btnHamburger: {
-    minWidth:0
+    minWidth: 0,
   },
   avatar: {
-    borderRadius:"50%",
+    borderRadius: "50%",
   },
   menuPaper: {
-    width:"200px",
+    width: "200px",
     backgroundColor: theme.palette.common.backgroundDark,
     marginTop: "60px",
-    transform: 'translateX(8%)',
-    borderBottomLeftRadius:"1em",
-    borderTopRightRadius:0
+    transform: "translateX(8%)",
+    borderBottomLeftRadius: "1em",
+    borderTopRightRadius: 0,
   },
   menuItemRoot: {
     display: "flex",
-    justifyContent:"flex-start",
+    justifyContent: "flex-start",
     marginLeft: "0.5em",
     fontWeight: "bold",
     color: theme.palette.common.textWhite,
-    height:"3em",
+    height: "3em",
   },
-  menuItemProfileRoot:{
+  menuItemProfileRoot: {
     display: "flex",
-    justifyContent:"center",
+    justifyContent: "center",
     fontWeight: "bold",
     color: theme.palette.common.textWhite,
-    height:"4em",
-
+    height: "4em",
   },
   underline: {
     border: "2px solid #8B8B8B",
-    width:"100%"
+    width: "100%",
   },
-  profileName:{
-    marginLeft:"1em",
-    fontWeight:"bold"
-  }
+  profileName: {
+    marginLeft: "1em",
+    fontWeight: "bold",
+  },
 }));
 
 const HeaderLogged = () => {
@@ -134,8 +130,6 @@ const HeaderLogged = () => {
   const matches760 = useMediaQuery("(max-width:760px)");
   const [anchorMenu, setAnchorMenu] = useState(null);
   const open = Boolean(anchorMenu);
-
-
 
   // Dom Handlers
   const handleMenuClick = (event) => {
@@ -154,7 +148,6 @@ const HeaderLogged = () => {
         alignItems="center"
         className={classes.main}
       >
-        
         {/* Right : Search */}
         <Grid item container xs justify="flex-start" alignItems="center">
           {/** Search Icon **/}
@@ -169,7 +162,7 @@ const HeaderLogged = () => {
               <SearchIcon />
             </div>
           </Grid>
-  
+
           {/** Search Box **/}
           <Grid item>
             <div className={classes.search}>
@@ -184,14 +177,16 @@ const HeaderLogged = () => {
             </div>
           </Grid>
         </Grid>
-  
+
         {/* Middle : Logo */}
-        <Grid 
-          item container 
-          justify="center" 
-          alignItems="center" 
+        <Grid
+          item
+          container
+          justify="center"
+          alignItems="center"
           xs
-          style={{display: matches760 ? "none": "inline-flex"}}>
+          style={{ display: matches760 ? "none" : "inline-flex" }}
+        >
           <Image
             src="/images/logo.svg"
             alt="logo"
@@ -200,51 +195,37 @@ const HeaderLogged = () => {
             layout="intrinsic"
           />
         </Grid>
-  
+
         {/* Left : Links */}
-        <Grid 
-          item container 
+        <Grid
+          item
+          container
           alignItems="center"
           justify="flex-end"
           xs
-          style={{display: matches860 ? "none" : "inline-flex"}}
-  
-          >
+          style={{ display: matches860 ? "none" : "inline-flex" }}
+        >
           <Grid item>
-            <Button
-              className={classes.btn}
-              classes={{ root: classes.btnRoot }}
-              
-            >
+            <Button className={classes.btn} classes={{ root: classes.btnRoot }}>
               My List
             </Button>
           </Grid>
           <Grid item>
-            <Button
-              className={classes.btn}
-              classes={{ root: classes.btnRoot }}
-              
-              
-            >
+            <Button className={classes.btn} classes={{ root: classes.btnRoot }}>
               Home
+            </Button>
+          </Grid>
+          <Grid item>
+            <Button className={classes.btn} classes={{ root: classes.btnRoot }}>
+              <NotificationsNoneIcon />
             </Button>
           </Grid>
           <Grid item>
             <Button
               className={classes.btn}
               classes={{ root: classes.btnRoot }}
-              
-            >
-              <NotificationsNoneIcon />
-            </Button>
-          </Grid>
-          <Grid 
-            item>
-            <Button
-              className={classes.btn}
-              classes={{ root: classes.btnRoot }}
               onClick={handleMenuClick}
-              >
+            >
               <Image
                 src="/images/avatarExample1.jpg"
                 alt="avatar"
@@ -254,28 +235,30 @@ const HeaderLogged = () => {
                 className={classes.avatar}
               />
             </Button>
-            
           </Grid>
         </Grid>
-      
+
         {/* Responsive Hamburger Icon */}
-        <Grid 
-          item container 
-          justify="flex-end" 
+        <Grid
+          item
+          container
+          justify="flex-end"
           xs={3}
-          style={{display: matches860 ? "inline-flex" : "none"}}>
+          style={{ display: matches860 ? "inline-flex" : "none" }}
+        >
           <Button
-            style={{display: matches860 ? "inline-flex" : "none", color:"white"}}
-            classes={{root: classes.btnHamburger}}
+            style={{
+              display: matches860 ? "inline-flex" : "none",
+              color: "white",
+            }}
+            classes={{ root: classes.btnHamburger }}
             onClick={handleMenuClick}
           >
-            <MenuIcon/>
+            <MenuIcon />
           </Button>
-          
         </Grid>
-      
       </Grid>
-      
+
       {/* Menu Modal  */}
       <Menu
         id="fade-menu"
@@ -284,132 +267,126 @@ const HeaderLogged = () => {
         open={open}
         onClose={handleMenuClose}
         TransitionComponent={Fade}
-        classes={{paper: classes.menuPaper}}
+        classes={{ paper: classes.menuPaper }}
         className={classes.menu}
       >
-        
         {/* Profile Part - map will be used soon. */}
-        <MenuItem 
+        <MenuItem
           onClick={handleMenuClose}
-          classes={{root: classes.menuItemProfileRoot}}>
-            <Grid item container
-              justify="flex-start"
-              alignItems="center">
-              <Grid item>
-                <Button
-                  className={classes.btn}
-                  classes={{ root: classes.btnRoot }}
-                  onClick={handleMenuClick}
-                  >
-                  <Image
-                    src="/images/avatarExample1.jpg"
-                    alt="avatar"
-                    width={45}
-                    height={45}
-                    layout="intrinsic"
-                    className={classes.avatar}
-                  />
-                </Button>
-              </Grid>
-              <Grid item>
-                <Typography
-                  className={classes.profileName}>Jessica</Typography>
-              </Grid>
-              
+          classes={{ root: classes.menuItemProfileRoot }}
+        >
+          <Grid item container justify="flex-start" alignItems="center">
+            <Grid item>
+              <Button
+                className={classes.btn}
+                classes={{ root: classes.btnRoot }}
+                onClick={handleMenuClick}
+              >
+                <Image
+                  src="/images/avatarExample1.jpg"
+                  alt="avatar"
+                  width={45}
+                  height={45}
+                  layout="intrinsic"
+                  className={classes.avatar}
+                />
+              </Button>
             </Grid>
+            <Grid item>
+              <Typography className={classes.profileName}>Jessica</Typography>
+            </Grid>
+          </Grid>
         </MenuItem>
-        <MenuItem 
+        <MenuItem
           onClick={handleMenuClose}
-          classes={{root: classes.menuItemProfileRoot}}>
-            <Grid item container
-              justify="flex-start"
-              alignItems="center">
-              <Grid item>
-                <Button
-                  className={classes.btn}
-                  classes={{ root: classes.btnRoot }}
-                  onClick={handleMenuClick}
-                  >
-                  <Image
-                    src="/images/avatarExample1.jpg"
-                    alt="avatar"
-                    width={45}
-                    height={45}
-                    layout="intrinsic"
-                    className={classes.avatar}
-                  />
-                </Button>
-              </Grid>
-              <Grid item>
-                <Typography
-                  className={classes.profileName}>Brad</Typography>
-              </Grid>
-              
+          classes={{ root: classes.menuItemProfileRoot }}
+        >
+          <Grid item container justify="flex-start" alignItems="center">
+            <Grid item>
+              <Button
+                className={classes.btn}
+                classes={{ root: classes.btnRoot }}
+                onClick={handleMenuClick}
+              >
+                <Image
+                  src="/images/avatarExample1.jpg"
+                  alt="avatar"
+                  width={45}
+                  height={45}
+                  layout="intrinsic"
+                  className={classes.avatar}
+                />
+              </Button>
             </Grid>
+            <Grid item>
+              <Typography className={classes.profileName}>Brad</Typography>
+            </Grid>
+          </Grid>
         </MenuItem>
-        <MenuItem 
+        <MenuItem
           onClick={handleMenuClose}
-          classes={{root: classes.menuItemProfileRoot}}>
-            <Grid item container
-              justify="flex-start"
-              alignItems="center">
-              <Grid item>
-                <Button
-                  className={classes.btn}
-                  classes={{ root: classes.btnRoot }}
-                  onClick={handleMenuClick}
-                  >
-                  <Image
-                    src="/images/avatarExample1.jpg"
-                    alt="avatar"
-                    width={45}
-                    height={45}
-                    layout="intrinsic"
-                    className={classes.avatar}
-                  />
-                </Button>
-              </Grid>
-              <Grid item>
-                <Typography
-                  className={classes.profileName}>Maria</Typography>
-              </Grid>
-              
+          classes={{ root: classes.menuItemProfileRoot }}
+        >
+          <Grid item container justify="flex-start" alignItems="center">
+            <Grid item>
+              <Button
+                className={classes.btn}
+                classes={{ root: classes.btnRoot }}
+                onClick={handleMenuClick}
+              >
+                <Image
+                  src="/images/avatarExample1.jpg"
+                  alt="avatar"
+                  width={45}
+                  height={45}
+                  layout="intrinsic"
+                  className={classes.avatar}
+                />
+              </Button>
             </Grid>
+            <Grid item>
+              <Typography className={classes.profileName}>Maria</Typography>
+            </Grid>
+          </Grid>
         </MenuItem>
-        
+
         {/* Link Part */}
         <MenuItem>
           <div className={classes.underline} />
         </MenuItem>
-        <MenuItem 
+        <MenuItem
           onClick={handleMenuClose}
-          classes={{root: classes.menuItemRoot}}
-          style={{display: matches860 ? "flex" : "none"}}>
-            My List
+          classes={{ root: classes.menuItemRoot }}
+          style={{ display: matches860 ? "flex" : "none" }}
+        >
+          My List
         </MenuItem>
-        <MenuItem 
+        <MenuItem
           onClick={handleMenuClose}
-          classes={{root: classes.menuItemRoot}}
-          style={{display: matches860 ? "flex" : "none"}}>
-            Home
+          classes={{ root: classes.menuItemRoot }}
+          style={{ display: matches860 ? "flex" : "none" }}
+        >
+          Home
         </MenuItem>
-        <MenuItem 
+        <MenuItem
           onClick={handleMenuClose}
-          classes={{root: classes.menuItemRoot}}
-          style={{display: matches860 ? "flex" : "none"}}>
-            Notifications
+          classes={{ root: classes.menuItemRoot }}
+          style={{ display: matches860 ? "flex" : "none" }}
+        >
+          Notifications
         </MenuItem>
-        <MenuItem 
+        <MenuItem
           onClick={handleMenuClose}
-          classes={{root: classes.menuItemRoot}}>
-            Account
+          classes={{ root: classes.menuItemRoot }}
+        >
+          Account
         </MenuItem>
-        <MenuItem 
+        <MenuItem
           onClick={handleMenuClose}
-          classes={{root: classes.menuItemRoot}}>
-            Sign Out
-         </MenuItem>
-      
+          classes={{ root: classes.menuItemRoot }}
+        >
+          Sign Out
+        </MenuItem>
       </Menu>
     </>
   );

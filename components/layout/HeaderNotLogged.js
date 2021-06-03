@@ -14,10 +14,7 @@ const useStyles = makeStyles((theme) => ({
   main: {
     padding: "1em 3em",
     backgroundColor: theme.palette.common.backgroundDark,
-    height: "90px",
-    [theme.breakpoints.down("md")]: {
-      height:"80px",
-    },
+    height: "10vh",
   },
   btn: {
     color: theme.palette.common.textWhite,

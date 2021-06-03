@@ -1,26 +1,41 @@
-import {gql} from "apollo-server-micro"
+import { gql } from "apollo-server-micro";
 
 // Schema for graphql
 export const typeDefs = gql`
   type Query {
-    users: [User]
+    users: [User!]
   }
 
   type Mutation {
-    addUser(userInput: UserInput!): User! 
+    addUser(fields: UserSignUpInput!): User!
+    authUser(fields: UserAuthInput!): User!
   }
 
   type User {
     _id: ID!
-    name: String!
     email: String!
-    password: String! 
+    name: String
+    password: String
+    lastname: String
+    avatar: String
+    profiles: [Profile!]
+    token: String
   }
 
-  input UserInput {
+  type Profile {
     name: String!
-    email: String!
-    password: String! 
+    avatar: String
+    kid: Boolean
   }
 
+  input UserSignUpInput {
+    name: String!
+    email: String!
+    password: String!
+  }
+
+  input UserAuthInput {
+    email: String!
+    password: String!
+  }
 `;

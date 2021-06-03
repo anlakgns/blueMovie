@@ -7,12 +7,9 @@ const useStyles = makeStyles((theme) => ({
   main: {
     padding: "1em 3em",
     backgroundColor: theme.palette.common.backgroundDark,
-    height: "90px",
+    height: "10vh",
     position: "fixed",
     bottom:0,
-    [theme.breakpoints.down("md")]: {
-      height:"80px",
-    },
   },
   text: {
     color:theme.palette.common.textWhite,
