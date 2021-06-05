@@ -1,7 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 import validator from "validator";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -85,21 +84,7 @@ userSchema.methods.comparePassword = async function(candidatePassword) {
 
 
 
-// Creating Token, Dont use arraw function here this doesnt work well
-userSchema.methods.generateToken = async function () {
-  const user = this;
-  const token = jwt.sign({ email: user.email }, "supersecretpassword", {
-    expiresIn: "7d",
-  });
-
-
-  user.token = token;
-  return user.save();
-};
-
-
 // Model : a wrapper for the schema, providing an interface to the database for CRUD operations.
 mongoose.models = {}; // for graphql bug
 export const User = mongoose.model("User", userSchema);
 
-// Not : I added an methods to schema here. It take it an object for its prototype. So I mean the method I created as generateToken can be used instance of the models.

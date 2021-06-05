@@ -4,11 +4,15 @@ import { gql } from "apollo-server-micro";
 export const typeDefs = gql`
   type Query {
     users: [User!]
+    user(id: ID!) : User!
+    isAuth: User!
   }
 
   type Mutation {
-    addUser(fields: UserSignUpInput!): User!
-    authUser(fields: UserAuthInput!): User!
+    createUser(fields: UserSignUpInput!): User!
+    loginUser(fields: UserAuthInput!): User!
+    updateUser(name: String, lastname: String, _id:ID!): User!
+    updateUserEmailPass(email: String!, password: String, _id:ID!): User!
   }
 
   type User {

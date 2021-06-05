@@ -9,9 +9,15 @@ const db = process.env.MONGODB_URL
 const apolloServer = new ApolloServer({
   typeDefs,
   resolvers,
-  context : async() => {
+  context : async({req}) => {
+    // Context function is called with every request.
+
+    // Authentication
+    req.headers.authorization = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwYmFjNGIwNzg0ODMwNzRiNTQyNTdkZCIsImlhdCI6MTYyMjg1Mjc4NCwiZXhwIjoxNjIzNDU3NTg0fQ.NrBT5tsFvw_gNdOcICVKpIuheFBFPIPi-PwH2Mj-LaM"
+
+    // Database Connection
     if(mongoose.connections[0].readyState) {
-      return;
+      return {req};
     }
     await mongoose.connect(db, 
       {
@@ -24,6 +30,8 @@ const apolloServer = new ApolloServer({
       .catch((err)=> {
         console.log(err.reason)
       })
+
+      return {req}
   }
 });
 
@@ -37,3 +45,7 @@ export const config = {
 }
 
 export default handler
+
+
+// Notes 
+// Context : An object or an function that creates an object that is passed to every resolver. This enables resolvers to share helpful context. It is usefull for passing things that any resolver might need, like authentication scope, database connection and custom fetch functions. This context function is called with every request, so you can set the context based on the request's detail such HTTP headers.
