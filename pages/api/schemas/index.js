@@ -5,7 +5,7 @@ export const typeDefs = gql`
   type Query {
     users: [User!]
     user(id: ID!) : User!
-    isAuth: User!
+    isAuth: Auth!
   }
 
   type Mutation {
@@ -13,6 +13,7 @@ export const typeDefs = gql`
     loginUser(fields: UserAuthInput!): User!
     updateUser(name: String, lastname: String, _id:ID!): User!
     updateUserEmailPass(email: String!, password: String, _id:ID!): User!
+    logoutUser: Boolean!
   }
 
   type User {
@@ -23,7 +24,6 @@ export const typeDefs = gql`
     lastname: String
     avatar: String
     profiles: [Profile!]
-    token: String
   }
 
   type Profile {
@@ -41,5 +41,10 @@ export const typeDefs = gql`
   input UserAuthInput {
     email: String!
     password: String!
+  }
+
+  type Auth {
+    isAuth: Boolean!
+    _id: ID!
   }
 `;

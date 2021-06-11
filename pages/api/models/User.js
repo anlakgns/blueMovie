@@ -31,6 +31,9 @@ const userSchema = new Schema({
     required: [true, "A user must have a name."],
     minlength: 5,
   },
+  passwordChangedAt: {
+    type: Date
+  },
   avatar: {
     type: String,
     default: "default.jpg",

@@ -1,6 +1,7 @@
-import { useState } from "react";
-
+import { useState, useContext } from "react";
 import Image from "next/image";
+import {useRouter} from "next/router"
+import {useMutation} from "@apollo/client"
 
 import Grid from "@material-ui/core/Grid";
 import Button from "@material-ui/core/Button";
@@ -14,6 +15,9 @@ import MenuIcon from "@material-ui/icons/Menu";
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
 import Fade from "@material-ui/core/Fade";
+
+import {AuthContext} from "../../shared/contexts/AuthContext"
+import {LOGOUT} from "../../shared/apolloRequests"
 
 const useStyles = makeStyles((theme) => ({
   main: {
@@ -93,8 +97,8 @@ const useStyles = makeStyles((theme) => ({
   },
   menuPaper: {
     width: "200px",
-    backgroundColor: theme.palette.common.backgroundDark,
-    marginTop: "60px",
+    backgroundColor: theme.palette.primary.main,
+    marginTop: "7.8vh",
     transform: "translateX(8%)",
     borderBottomLeftRadius: "1em",
     borderTopRightRadius: 0,
@@ -122,14 +126,34 @@ const useStyles = makeStyles((theme) => ({
     marginLeft: "1em",
     fontWeight: "bold",
   },
+  logoImage:{
+    cursor:"pointer"
+  }
 }));
 
 const HeaderLogged = () => {
   const classes = useStyles();
+  const history = useRouter()
+  const {setAuthStates} = useContext(AuthContext)
   const matches860 = useMediaQuery("(max-width:860px)");
   const matches760 = useMediaQuery("(max-width:760px)");
   const [anchorMenu, setAnchorMenu] = useState(null);
   const open = Boolean(anchorMenu);
+  const [logoutUser, logoutResponse] = useMutation(LOGOUT,
+    {
+      onCompleted: () => {
+        setAuthStates(prev => {
+          return {
+            ...prev,
+            isAuth: false
+          }
+        })
+        history.push("/")
+      },
+      onError: (err)=> {
+        console.log(err)
+      }
+    })
 
   // Dom Handlers
   const handleMenuClick = (event) => {
@@ -137,7 +161,18 @@ const HeaderLogged = () => {
   };
   const handleMenuClose = () => {
     setAnchorMenu(null);
+
   };
+  const handleSignOut = () => {
+    setAnchorMenu(null);
+    logoutUser()
+  };
+  const handleLogo = () => {
+    history.push('/')
+  }
+  const handleMenuAccount = () => {
+    history.push("/account")
+  }
 
   return (
     <>
@@ -184,6 +219,8 @@ const HeaderLogged = () => {
           container
           justify="center"
           alignItems="center"
+          onClick={handleLogo}
+          className={classes.logoGridContainer}
           xs
           style={{ display: matches760 ? "none" : "inline-flex" }}
         >
@@ -193,6 +230,8 @@ const HeaderLogged = () => {
             width={171}
             height={51}
             layout="intrinsic"
+            className={classes.logoImage}
+
           />
         </Grid>
 
@@ -246,18 +285,18 @@ const HeaderLogged = () => {
           xs={3}
           style={{ display: matches860 ? "inline-flex" : "none" }}
         >
-          <Button
-            style={{
-              display: matches860 ? "inline-flex" : "none",
-              color: "white",
-            }}
-            classes={{ root: classes.btnHamburger }}
-            onClick={handleMenuClick}
-          >
-            <MenuIcon />
-          </Button>
+            <Button
+              style={{
+                display: matches860 ? "inline-flex" : "none",
+                color: "white",
+              }}
+              classes={{ root: classes.btnHamburger }}
+              onClick={handleMenuClick}
+            >
+              <MenuIcon />
+            </Button>
+          </Grid>
         </Grid>
-      </Grid>
 
       {/* Menu Modal  */}
       <Menu
@@ -376,13 +415,13 @@ const HeaderLogged = () => {
           Notifications
         </MenuItem>
         <MenuItem
-          onClick={handleMenuClose}
+          onClick={handleMenuAccount}
           classes={{ root: classes.menuItemRoot }}
         >
           Account
         </MenuItem>
         <MenuItem
-          onClick={handleMenuClose}
+          onClick={handleSignOut}
           classes={{ root: classes.menuItemRoot }}
         >
           Sign Out
@@ -393,3 +432,4 @@ const HeaderLogged = () => {
 };
 
 export default HeaderLogged;
+

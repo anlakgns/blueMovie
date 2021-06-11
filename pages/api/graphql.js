@@ -1,51 +1,46 @@
 // we need apollo-server-micro for graphql in next.js
-import {ApolloServer} from "apollo-server-micro"
-import {typeDefs} from "./schemas"
-import {resolvers} from "./resolvers"
-import mongoose from "mongoose"
+import { ApolloServer } from "apollo-server-micro";
+import { typeDefs } from "./schemas";
+import { resolvers } from "./resolvers";
+import mongoose from "mongoose";
 
-const db = process.env.MONGODB_URL
+const db = process.env.MONGODB_URL;
 
 const apolloServer = new ApolloServer({
   typeDefs,
   resolvers,
-  context : async({req}) => {
+  context: async ({ req, res }) => {
     // Context function is called with every request.
-
-    // Authentication
-    req.headers.authorization = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwYmFjNGIwNzg0ODMwNzRiNTQyNTdkZCIsImlhdCI6MTYyMjg1Mjc4NCwiZXhwIjoxNjIzNDU3NTg0fQ.NrBT5tsFvw_gNdOcICVKpIuheFBFPIPi-PwH2Mj-LaM"
-
+    console.log(req.cookies)
     // Database Connection
-    if(mongoose.connections[0].readyState) {
-      return {req};
+    if (mongoose.connections[0].readyState) {
+      return { req, res };
     }
-    await mongoose.connect(db, 
-      {
-        useNewUrlParser: true, 
-        useUnifiedTopology: true
+    await mongoose
+      .connect(db, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
       })
-      .then(()=> {
-        console.log("mongoDB connected.")
+      .then(() => {
+        console.log("mongoDB connected.");
       })
-      .catch((err)=> {
-        console.log(err.reason)
-      })
+      .catch((err) => {
+        console.log(err.reason);
+      });
 
-      return {req}
-  }
+    return { req, res };
+  },
 });
-
-const handler = apolloServer.createHandler({path: "/api/graphql"})
+const handler = apolloServer.createHandler({ path: "/api/graphql" });
 
 // Apollo Server or nextjs do the parser for us
 export const config = {
   api: {
-    bodyParser : false
-  }
-}
+    bodyParser: false,
+  },
+};
 
-export default handler
+export default handler;
 
-
-// Notes 
+// Notes
 // Context : An object or an function that creates an object that is passed to every resolver. This enables resolvers to share helpful context. It is usefull for passing things that any resolver might need, like authentication scope, database connection and custom fetch functions. This context function is called with every request, so you can set the context based on the request's detail such HTTP headers.

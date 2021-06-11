@@ -15,6 +15,8 @@ const useStyles = makeStyles(theme => ({
  },
 }))
 
+
+
 const Auth = ({logStatus})=> {
   const classes = useStyles()
   return (

@@ -1,5 +1,6 @@
 import {useState} from "react"
 import Image from "next/image";
+import {useRouter} from "next/router"
 
 import Grid from "@material-ui/core/Grid";
 import Button from "@material-ui/core/Button";
@@ -12,7 +13,8 @@ import Fade from '@material-ui/core/Fade';
 
 const useStyles = makeStyles((theme) => ({
   main: {
-    padding: "1em 3em",
+    paddingLeft:"1em",
+    paddingRight:"1em",
     backgroundColor: theme.palette.common.backgroundDark,
     height: "10vh",
   },
@@ -51,6 +53,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const HeaderNotLogged = () => {
+  const history = useRouter()
   const classes = useStyles();
   const matches800 = useMediaQuery('(max-width:800px)');
   const [anchorMenu, setAnchorMenu] = useState(null);
@@ -65,6 +68,17 @@ const HeaderNotLogged = () => {
   const handleMenuClose = () => {
     setAnchorMenu(null);
   };
+  const handleMenuLogin = () => {
+    history.push('/auth')
+  }
+  const handleMenuSignup = () => {
+    history.push('/auth')
+  };
+  const handleLogo = ()=> {
+    setAnchorMenu(null);
+    history.push('/')
+  };
+ 
 
   return (
     <Grid
@@ -77,13 +91,18 @@ const HeaderNotLogged = () => {
       {/* Left : Scroll Links */}
       <Grid 
         item container 
-        xs={8}>
-        <Image 
-          src="/images/logo.svg" 
-          alt="logo" 
-          width={171} 
-          height={51} 
-          layout="intrinsic"/>
+        xs={8}
+        >
+        <Button
+          onClick={handleLogo}>
+          <Image 
+            src="/images/logo.svg" 
+            alt="logo" 
+            width={171} 
+            height={51} 
+            layout="intrinsic"/>
+        </Button>
+        
         <Button 
           className={classes.btn}
           classes={{root: classes.btnRoot}}
@@ -110,10 +129,12 @@ const HeaderNotLogged = () => {
         <Button 
           className={classes.btn}
           classes={{root: classes.btnRoot}}
+          onClick={handleMenuLogin}
           >
             Login
          </Button>
         <Button 
+          onClick={handleMenuSignup}
           className={classes.btn} 
           classes={{root: classes.btnRoot}}
           >Sign Up
@@ -159,12 +180,12 @@ const HeaderNotLogged = () => {
             <div className={classes.underline} />
           </MenuItem>
           <MenuItem 
-            onClick={handleMenuClose}
+            onClick={handleMenuLogin}
             classes={{root: classes.menuItemRoot}}>
               Log In
           </MenuItem>
           <MenuItem 
-            onClick={handleMenuClose}
+            onClick={handleMenuSignup}
             classes={{root: classes.menuItemRoot}}>
               Sign Up
            </MenuItem>

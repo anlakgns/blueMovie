@@ -1,31 +1,31 @@
 import jwt from "jsonwebtoken";
+import {throwAuthError} from "./helpers"
 
 
 export const authorizeAndGetId = (req) => {
+  
+  // Token exist check
+  if(!req.cookies.token ||
+    !req.cookies.token.startsWith('Bearer')) {
+      throwAuthError("Bad Token")
+    }
+  
+  const token = req.cookies.token.replace("Bearer ", "");
 
-  // Token Exist Check
-  if(!req.headers.authorization) {
-    throwAuthError("Token does not exist.")
-  }
-  
-  // Token Extract
-  const token = req.headers.authorization.replace("Bearer ", "")
-  
-  // Token Extract Check
+  // Token extract check
   if(!token) {
-    throwAuthError("Token couldn't be formatted.")
+    throwAuthError("Token can't be formatted")
   }
   
+
   // Verify Token
-  const decodedToken = jwt.verify(token, "supersecretpassword")
-  
-  // Verify Check
+  const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+
+  // Token Verified Check
   if(!decodedToken) {
-    throwAuthError("Token couldn't be verified.")
+    throwAuthError("Token can't be verified.")
   }
-    
-  return decodedToken.id
-}
 
-
+  return decodedToken.id;
+};
 

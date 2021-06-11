@@ -8,7 +8,6 @@ const useStyles = makeStyles((theme) => ({
     padding: "1em 3em",
     backgroundColor: theme.palette.common.backgroundDark,
     height: "10vh",
-    position: "fixed",
     bottom:0,
   },
   text: {

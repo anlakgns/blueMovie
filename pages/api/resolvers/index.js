@@ -3,6 +3,8 @@ import { AuthenticationError, ApolloError } from "apollo-server-micro";
 import { isUserOwner } from "../utils/helpers";
 import { throwAuthError } from "../utils/helpers";
 import { generateToken } from "../utils/helpers";
+import { sendCookie } from "../utils/helpers";
+import { deleteCookie } from "../utils/helpers";
 import { authorizeAndGetId } from "../utils/authorize";
 
 // Resolvers for graphql
@@ -36,6 +38,18 @@ export const resolvers = {
         throw err;
       }
     },
+    isAuth: async (parent, args, context, info) => {
+      try{
+        const _id = authorizeAndGetId(context.req);
+
+        return {
+          isAuth: true,
+          _id: _id
+        }
+      } catch (err) {
+        throw (err) 
+      }
+    }
   },
 
   Mutation: {
@@ -54,14 +68,19 @@ export const resolvers = {
           name: args.fields.name,
           email: args.fields.email,
           password: args.fields.password,
+          passwordChangedAt: Date.now(),
         });
+
         // Generate Token
         const token = generateToken(user._id);
 
         // Saving DB
         const data = await user.save();
 
-        return { ...data._doc, token: token };
+        // Send Cookie
+        sendCookie(context.res, token)
+
+        return { ...data._doc };
       } catch (err) {
         throw err;
       }
@@ -69,6 +88,7 @@ export const resolvers = {
 
     loginUser: async (parent, args, context, info) => {
       try {
+        
         // Check the mail
         const user = await User.findOne({ email: args.fields.email });
         if (!user) {
@@ -81,14 +101,17 @@ export const resolvers = {
           throwAuthError("Incorrect Password.");
         }
 
-        // User must be right, Send his token.
+        // User Correct - Generate Token
         const token = generateToken(user._id);
+
+        // Send Cookie
+        sendCookie(context.res, token)
 
         // Return
         return {
           _id: user._id,
           email: user.email,
-          token: token,
+          name: user.name
         };
       } catch (err) {
         throw err;
@@ -105,7 +128,6 @@ export const resolvers = {
         }
 
         // Validate Fields Please
-
         const user = await User.findByIdAndUpdate(
           _id,
           {
@@ -116,6 +138,12 @@ export const resolvers = {
             new: true,
           }
         );
+
+        // generate new token
+        const token = generateToken(user._id)
+
+        // update cookie
+        sendCookie(context.res, token)
 
         return { ...user._doc };
       } catch (err) {
@@ -134,7 +162,6 @@ export const resolvers = {
 
         const user = await User.findOne({ _id: args._id });
         if (!user) throwAuthError("Sorry try again.");
-        console.log(user.email, args);
 
         // Validate Fields Please
         if (args.email) {
@@ -149,15 +176,44 @@ export const resolvers = {
 
         // Saving DB
         const data = await user.save();
-        console.log(user.email, token, data);
 
         return { ...data._doc, token: token };
       } catch (err) {
         throw new ApolloError("Something went wrong.", err);
       }
     },
-  },
-};
+
+    logoutUser: async (parent, args, context, info) => {
+       
+      try {
+        deleteCookie(context.res)
+        return true
+      } catch (err) {
+        throw new ApolloError("Something went wrong.", err);
+      }
+    
+    },
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // isAuth: async (parent, args, context, info) => {
 //   try {
@@ -174,3 +230,5 @@ export const resolvers = {
 //     throw err
 //   }
 // },
+
+
