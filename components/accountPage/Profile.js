@@ -1,17 +1,19 @@
 import {useContext} from "react"
 import Image from "next/image";
 import {useRouter} from "next/router"
+import {useMutation} from "@apollo/client"
 
+import useMediaQuery from '@material-ui/core/useMediaQuery';
 import Grid from "@material-ui/core/Grid";
 import IconButton from "@material-ui/core/IconButton";
 import Button from "@material-ui/core/Button";
 import EditIcon from "@material-ui/icons/Edit";
-import { makeStyles } from "@material-ui/styles";
+import { makeStyles, useTheme } from "@material-ui/styles";
 import { Typography } from "@material-ui/core";
 import AddIcon from "@material-ui/icons/Add";
-import {useMutation} from "@apollo/client"
-import {LOGOUT} from "../../shared/apolloRequests"
+import Hidden from '@material-ui/core/Hidden';
 
+import {LOGOUT} from "../../shared/apolloRequests"
 import {AuthContext} from "../../shared/contexts/AuthContext"
 
 const useStyles = makeStyles((theme) => ({
@@ -55,6 +57,7 @@ const useStyles = makeStyles((theme) => ({
     height: "1em",
     width: "1em",
     opacity: 0.7,
+
   },
   watchTimeItem: {
     width: "5em",
@@ -62,6 +65,9 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: theme.palette.primary.main,
     opacity: 0.8,
     borderRadius: "1em",
+    [theme.breakpoints.down("md")]: {
+      width:"4em"
+    }
   },
   watchTimeNumbers: {
     color: theme.palette.common.textWhite,
@@ -77,7 +83,10 @@ const useStyles = makeStyles((theme) => ({
     color: "white",
     width:"15em",
     marginTop:"3em",
-    marginBottom:"3em"
+    marginBottom:"3em",
+    [theme.breakpoints.down("md")]: {
+      width: "12em"
+    }
   },
   avatar: {
     borderRadius:"50%",
@@ -86,14 +95,32 @@ const useStyles = makeStyles((theme) => ({
     marginBottom:"1em"
   },
   profileAvatars:{
-    borderRadius: "50%"
+    borderRadius: "50%",
+  },
+  profileAvatarsGrid:{
+    [theme.breakpoints.down("md")]: {
+      marginRight:"2em"
+    }
+  },
+  profileName:{
+    color: theme.palette.common.textWhite,
+    fontSize:"1em"
+  },
+  profileItemGrid:{
+    [theme.breakpoints.down("md")]: {
+      marginLeft:"2em"
+    }
   }
+
 }));
 
 export const Profile = () => {
   const classes = useStyles();
   const history = useRouter()
+  const theme = useTheme()
   const {setAuthStates} = useContext(AuthContext)
+  const matchesMD = useMediaQuery(theme.breakpoints.down('md'))
+  const matchesSM = useMediaQuery(theme.breakpoints.down('sm'))
   const [logoutUser, logoutResponse] = useMutation(LOGOUT,
     {
       onCompleted: () => {
@@ -108,8 +135,7 @@ export const Profile = () => {
       onError: (err)=> {
         console.log(err)
       }
-    })
-
+  })
   const profiles = [1,1,1,1]
 
 
@@ -117,7 +143,6 @@ export const Profile = () => {
   const handleLogout = () => {
     logoutUser()
   }
-
 
   return (
     <>
@@ -145,8 +170,8 @@ export const Profile = () => {
               className={classes.avatar}
               src="/images/avatarExample1.jpg"
               alt="profile picture"
-              width={150}
-              height={150}
+              width={matchesSM ? 120 : 150}
+              height={matchesSM ? 120 : 150}
             />
           </Grid>
 
@@ -168,27 +193,46 @@ export const Profile = () => {
               </Typography>
             </Grid>
             <Grid
-              item
-              container
+              item container
+              style={{
+
+              }}
+              direction={matchesMD ? "column": "row"}
               justify="space-around"
               alignItems="center"
               
               xs={10}
             >
               {
-                profiles.map(profile => {
+                profiles.map((profile,i) => {
                   return (
-                    <Image
-                    className={classes.profileAvatars}
-                    src="/images/avatarExample1.jpg"
-                    alt="profile picture"
-                    width={40}
-                    height={40}
-                    />
+                    <Grid 
+                      item container xs
+                      justify="flex-start"
+                      alignItems="center"
+                      className={classes.profileItemGrid}>
+                      <Grid 
+                        item 
+                        className={classes.profileAvatarsGrid}>
+                        <Image
+                        key={i}
+                        className={classes.profileAvatars}
+                        src="/images/avatarExample1.jpg"
+                        alt="profile picture"
+                        width={40}
+                        height={40}
+                        />
+                      </Grid>
+                      
+                      <Hidden lgUp>
+                        <Typography className={classes.profileName}>
+                          Brad
+                        </Typography>
+                      </Hidden>
+                    </Grid>                   
                   )
                 })
               }
-             
               
               <IconButton className={classes.btnPlusIcon}>
                 <AddIcon className={classes.editIcon} />
@@ -259,6 +303,7 @@ export const Profile = () => {
           onClick={handleLogout}>
             Log Out
         </Button>
+      
       </Grid>
     </>
   );

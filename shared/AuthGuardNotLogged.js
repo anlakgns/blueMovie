@@ -2,20 +2,20 @@ import {useContext} from "react"
 import { useRouter } from "next/router"
 import { useEffect } from "react"
 import { useQuery } from '@apollo/client';
-import {AuthContext} from "../shared/contexts/AuthContext"
-import { ISAUTH } from "../shared/apolloRequests";
+import {AuthContext} from "./contexts/AuthContext"
+import { ISAUTH } from "./apolloRequests";
 
-const AuthGuard = ({ children }) => {
+const AuthGuardNotLogged = ({ children }) => {
   const history = useRouter()
   const {loading,error,data} = useQuery(ISAUTH)
 
   useEffect(()=> {
-    if(!loading && !data?.isAuth.isAuth) {
-      history.push("/auth")
+    if(!loading && data?.isAuth.isAuth) {
+      history.push("/")
   }})
 
   
-  if (data?.isAuth.isAuth) {
+  if (!loading && !data?.isAuth.isAuth) {
     return <>{children}</>
   }
 
@@ -23,4 +23,4 @@ const AuthGuard = ({ children }) => {
   return null
 }
 
-export default AuthGuard
+export default AuthGuardNotLogged

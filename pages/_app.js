@@ -9,7 +9,8 @@ import Layout from "../components/layout/Layout"
 import {client} from "../apollo-client"
 import {ApolloProvider} from "@apollo/client"
 import {AuthProvider} from "../shared/contexts/AuthContext"
-import {AuthGuard} from "../shared/AuthGuard"
+import AuthGuard from "../shared/AuthGuard"
+import AuthGuardNotLogged from "../shared/AuthGuardNotLogged"
 
 export default function MyApp(props) {
   const { Component, pageProps } = props;
@@ -33,12 +34,18 @@ export default function MyApp(props) {
             {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
             <CssBaseline />
             <Layout>
-              {Component.requireAuth ? 
+              {Component.requireAuth === "requiredAuth" ?
                 <AuthGuard>
                   <Component {...pageProps} />
                 </AuthGuard>
                 : 
+                Component.requireAuth === "requiredNotAuth" ?
+                <AuthGuardNotLogged>
+                  <Component {...pageProps} />
+                </AuthGuardNotLogged> 
+                : 
                 <Component {...pageProps} />
+
               }
             </Layout>
           </AuthProvider>

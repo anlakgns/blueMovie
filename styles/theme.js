@@ -6,6 +6,8 @@ const theme = createMuiTheme({
   palette: {
     common: {
       textWhite: "#ffffff",
+      purple: "#BD41D1",
+      weakBlack:"#303340",
       backgroundDark: "#0D1323",
       error: "#ff1744"
     },

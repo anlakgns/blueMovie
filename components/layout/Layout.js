@@ -1,11 +1,15 @@
-import { useState, useEffect, useContext } from "react";
-
+import { useEffect, useContext } from "react";
 import HeaderNotLogged from "./HeaderNotLogged";
 import HeaderLogged from "./HeaderLogged";
 import { AuthContext } from "../../shared/contexts/AuthContext";
 import Footer from "./Footer";
 import { ISAUTH } from "../../shared/apolloRequests";
 import { useQuery } from "@apollo/client";
+
+
+
+
+
 
 const Layout = ({ children }) => {
   const { loading, error, data } = useQuery(ISAUTH);
@@ -32,15 +36,15 @@ const Layout = ({ children }) => {
   },[loading,error,data])
 
   return (
-    <>
-      {authStates.isAuth ? (
-        <HeaderLogged />
-      ) : (
-        <HeaderNotLogged />
-      )}
-      {children}
-      <Footer />
-    </>
+      <>
+        {authStates.isAuth ? (
+          <HeaderLogged />
+        ) : (
+          <HeaderNotLogged />
+        )}
+        {children}
+        <Footer />
+      </>
   );
 };
 

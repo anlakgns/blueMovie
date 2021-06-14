@@ -67,7 +67,6 @@ const AuthForm = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalContext, setModalContext] = useState("");
   const [hasAccount, setHasAccount] = useState(true);
- 
   const [createUser, responseRegister] = useMutation(REGISTER, {
     onCompleted: (data) => {
       setAuthStates((prev)=> {
@@ -78,7 +77,7 @@ const AuthForm = () => {
           userName: data.loginUser.name
         }
       })
-      history.push("/");
+      history.replace("/");
     },
     onError: (error) => {
       setModalOpen(true);
@@ -95,7 +94,7 @@ const AuthForm = () => {
           userName: data.loginUser.name
         }
       })
-      history.push("/");
+      history.replace("/");
 
     },
     onError: (error) => {
@@ -188,7 +187,6 @@ const AuthForm = () => {
                 classes={{
                   underline: classes.underline,
                   input: classes.inputRoot,
-                  error: classes.error,
                 }}
                 className={classes.inputs}
                 placeholder="Name"
@@ -218,7 +216,6 @@ const AuthForm = () => {
               classes={{
                 underline: classes.underline,
                 input: classes.inputRoot,
-                error: classes.error,
               }}
               className={classes.inputs}
               placeholder="Email"
@@ -248,7 +245,6 @@ const AuthForm = () => {
               classes={{
                 underline: classes.underline,
                 input: classes.inputRoot,
-                error: classes.error,
               }}
               className={classes.inputs}
               autoComplete="current-password"
@@ -279,7 +275,6 @@ const AuthForm = () => {
                 classes={{
                   underline: classes.underline,
                   input: classes.inputRoot,
-                  error: classes.error,
                 }}
                 className={classes.inputs}
                 placeholder="Password Confirm"
@@ -350,6 +345,7 @@ const AuthForm = () => {
               {hasAccount === true ? "Sign up" : "Sign in"}
             </Button>
           </Typography>
+        
         </Grid>
       </form>
       <ModalCard
