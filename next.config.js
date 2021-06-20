@@ -5,4 +5,7 @@ module.exports = {
     JWT_EXPIRES_IN : "90d",
     JWT_COOKIE_EXPIRES_IN : 90,
   },
+  images: {
+    domains: ['firebasestorage.googleapis.com'],
+  },
 }

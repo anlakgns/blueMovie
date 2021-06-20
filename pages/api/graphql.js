@@ -9,6 +9,7 @@ const db = process.env.MONGODB_URL;
 const apolloServer = new ApolloServer({
   typeDefs,
   resolvers,
+  upload:false,
   context: async ({ req, res }) => {
     // Context function is called with every request.
     console.log(req.cookies)

@@ -28,7 +28,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const ModalCard = ({
+const ErrorCard = ({
   headline,
   context,
   btnContext,
@@ -89,4 +89,4 @@ const ModalCard = ({
   );
 };
 
-export default ModalCard;
+export default ErrorCard;

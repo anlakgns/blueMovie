@@ -96,9 +96,10 @@ const ProfileList = () => {
       </Grid>
 
       {/* Profile Cards */}
-      {profiles.map(car => {
+      {profiles.map((car, i) => {
         return (
            <Grid 
+              key={i}
              item container 
              className={classes.profileItem}
              justify="space-around"

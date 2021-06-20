@@ -6,7 +6,13 @@ export const AuthProvider = (props) => {
   const [authStates, setAuthStates] = useState({
     isAuth: false,
     userId : "",
-    userName: "",
+    name: "",
+    email: "",
+    lastname: "",
+    avatar: "",
+    phone: "",
+    profiles: [],
+    plan:"",
   })
   
 

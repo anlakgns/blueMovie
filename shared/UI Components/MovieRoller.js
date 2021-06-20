@@ -102,7 +102,7 @@ const MovieRoller = ({
             <Grid item className={classes.imageGrid} key={i}>
               <Image
                 className={classes.image}
-                src="/images/red.png"
+                src="/images/errr.png"
                 alt="profile picture"
                 layout="fixed"
                 width={200}

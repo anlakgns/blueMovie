@@ -15,8 +15,8 @@ import MailOutlineIcon from "@material-ui/icons/MailOutline";
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import CircularProgress from "@material-ui/core/CircularProgress";
 
-import { LOGIN, REGISTER, ISAUTH } from "../../shared/apolloRequests";
-import ModalCard from "../../shared/UI Components/ModalCard";
+import { LOGIN, REGISTER, SINGLE_UPLOAD } from "../../shared/apolloRequests";
+import ModalCard from "../../shared/UI Components/ErrorCard";
 import {AuthContext} from "../../shared/contexts/AuthContext"
 
 const useStyles = makeStyles((theme) => ({
@@ -67,14 +67,15 @@ const AuthForm = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalContext, setModalContext] = useState("");
   const [hasAccount, setHasAccount] = useState(true);
+  const [avatarValue, setAvatarValue]= useState()
+  const [singleUpload] = useMutation(SINGLE_UPLOAD)
   const [createUser, responseRegister] = useMutation(REGISTER, {
     onCompleted: (data) => {
       setAuthStates((prev)=> {
         return {
           ...prev,
           isAuth: true,
-          userId: data.loginUser._id,
-          userName: data.loginUser.name
+          userId: data.createUser._id
         }
       })
       history.replace("/");
@@ -91,7 +92,12 @@ const AuthForm = () => {
           ...prev,
           isAuth: true,
           userId: data.loginUser._id,
-          userName: data.loginUser.name
+          name: data.loginUser.name,
+          email: data.loginUser.email,
+          lastname: data.loginUser.lastname,
+          avatar: data.loginUser.avatar,
+          phone: data.loginUser.phone,
+          profiles: data.loginUser.profiles,
         }
       })
       history.replace("/");
@@ -102,13 +108,15 @@ const AuthForm = () => {
       setModalContext(error.message);
     },
   });
-
   const formik = useFormik({
     initialValues: {
       name: "",
+      lastname: "",
+      phone:"",
       email: "",
       password: "",
       passwordConfirm: "",
+      avatar: null
     },
     validationSchema: Yup.object({
       name: hasAccount
@@ -145,8 +153,11 @@ const AuthForm = () => {
           variables: {
             fields: {
               name: values.name,
+              lastname: values.lastname,
+              phone:values.phone,
               email: values.email,
-              password: values.password,
+              password: values.passwordConfirm,
+              file: values.avatar,
             },
           },
         });
@@ -171,15 +182,15 @@ const AuthForm = () => {
     setModalOpen(false);
   };
 
-
   return (
     <>
       <Typography variant="h3" align="center" className={classes.headline}>
         {hasAccount ? "Login" : "Sign Up"}
       </Typography>
 
-      <form className={classes.formContainer} onSubmit={formik.handleSubmit}>
+      <form className={classes.formContainer} encType="multipart/form-data"  onSubmit={formik.handleSubmit}>
         <Grid container direction="column">
+          
           {/* Name Field */}
           {hasAccount === true ? null : (
             <Grid item>
@@ -205,6 +216,66 @@ const AuthForm = () => {
               {formik.touched.name && formik.errors.name ? (
                 <Typography className={classes.errorFeedback}>
                   {formik.errors.name}
+                </Typography>
+              ) : null}
+            </Grid>
+          )}
+
+          {/* Lastname Field */}
+          {hasAccount === true ? null : (
+            <Grid item>
+              <Input
+                classes={{
+                  underline: classes.underline,
+                  input: classes.inputRoot,
+                }}
+                className={classes.inputs}
+                placeholder="Lastname"
+                name="lastname"
+                inputProps={{ autoComplete: "off" }}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                value={formik.values.lastname}
+                error={Boolean(formik.touched.lastname && formik.errors.lastname)}
+                startAdornment={
+                  <InputAdornment>
+                    <AccountCircleIcon />
+                  </InputAdornment>
+                }
+              />
+              {formik.touched.lastname && formik.errors.lastname ? (
+                <Typography className={classes.errorFeedback}>
+                  {formik.errors.lastname}
+                </Typography>
+              ) : null}
+            </Grid>
+          )}
+
+           {/* Phone Field */}
+           {hasAccount === true ? null : (
+            <Grid item>
+              <Input
+                classes={{
+                  underline: classes.underline,
+                  input: classes.inputRoot,
+                }}
+                className={classes.inputs}
+                placeholder="Phone"
+                name="phone"
+                inputProps={{ autoComplete: "off" }}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                value={formik.values.phone}
+                error={Boolean(formik.touched.phone && formik.errors.phone)}
+                startAdornment={
+                  <InputAdornment>
+                    <AccountCircleIcon />
+                  </InputAdornment>
+                }
+              />
+              {formik.touched.phone && formik.errors.phone ? (
+                <Typography className={classes.errorFeedback}>
+                  {formik.errors.phone}
                 </Typography>
               ) : null}
             </Grid>
@@ -300,6 +371,29 @@ const AuthForm = () => {
                   {formik.errors.passwordConfirm}
                 </Typography>
               ) : null}
+            </Grid>
+          )}
+
+          {/* Avatar Field */}
+          {hasAccount === true ? null : (
+            <Grid item>
+              <Input
+                classes={{
+                  underline: classes.underline,
+                  input: classes.inputRoot,
+                }}
+                className={classes.inputs}
+                name="avatar"
+                onChange={(event) => {
+                  formik.setFieldValue("avatar", event.currentTarget.files[0]);
+                }}
+                inputProps={{ type: "file", accept: "image/png, image/jpeg" }}          
+                startAdornment={
+                  <InputAdornment>
+                    <LockOpenIcon />
+                  </InputAdornment>
+                }
+              />
             </Grid>
           )}
 

@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 import {throwAuthError} from "./helpers"
 
 
-export const authorizeAndGetId = (req) => {
+export const authorizeAndDecode = (req) => {
   
   // Token exist check
   if(!req.cookies.token ||
@@ -26,6 +26,6 @@ export const authorizeAndGetId = (req) => {
     throwAuthError("Token can't be verified.")
   }
 
-  return decodedToken.id;
+  return decodedToken
 };
 

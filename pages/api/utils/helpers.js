@@ -44,3 +44,9 @@ export const deleteCookie = (res) => {
     sameSite:"strict" //meaning: controls the cookie should be send which requests 
   }))
 }
+
+export const isTokenUpToDate = (issueAt, user) => {
+  const issueDate = new Date(issueAt*1000)
+  const changeDateAtDb = user.authInfoChangedAt
+  return issueDate > changeDateAtDb
+}

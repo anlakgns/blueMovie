@@ -28,7 +28,15 @@ const Layout = ({ children }) => {
       setAuthStates(prev=> {
         return {
           ...prev,
-          isAuth:true
+          isAuth:true,
+          name: data?.isAuth.name,
+          lastname: data?.isAuth.lastname,
+          phone:data?.isAuth.phone,
+          email: data?.isAuth.email,
+          password: data?.isAuth.passwordConfirm,
+          plan: data?.isAuth.plan,
+          avatar: data?.isAuth.avatar,
+          userId: data?.isAuth._id
         }
       })
     }

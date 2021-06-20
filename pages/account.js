@@ -1,5 +1,4 @@
-import {useState, useEffect, useContext} from "react"
-import {useRouter} from "next/router"
+import {useState, useContext} from "react"
 
 import Grid from "@material-ui/core/Grid"
 import {makeStyles} from "@material-ui/styles"
@@ -19,11 +18,8 @@ const useStyles = makeStyles(theme => ({
 
 
 const Account = () => {
-  const history = useRouter()
   const classes = useStyles()
   const [subSection, setSubSection] = useState("myList");
-  const {authStates} = useContext(AuthContext)
-
 
   return (
     <Grid 

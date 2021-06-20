@@ -31,12 +31,21 @@ const userSchema = new Schema({
     required: [true, "A user must have a name."],
     minlength: 5,
   },
-  passwordChangedAt: {
-    type: Date
+  authInfoChangedAt: {
+    type: Date,
   },
   avatar: {
     type: String,
     default: "default.jpg",
+  },
+  phone: {
+    type: String,
+    default: "",
+  },
+  plan: {
+    type: String,
+    enum: ["Starter", "Premium", "Trial"],
+    default: "Trial"
   },
   profiles: [
     {
@@ -56,9 +65,6 @@ const userSchema = new Schema({
       },
     },
   ],
-  token: {
-    type: String,
-  },
 });
 
 // Hashing Password Before Saving DB
@@ -70,24 +76,26 @@ userSchema.pre("save", async function (next) {
     // Hash the password with the cost of 10
     this.password = await bcrypt.hash(user.password, 10);
 
-
     next();
   } else {
     next();
   }
 });
 
+// Setting Date for checking whether token is up-to-date or not.
+userSchema.pre("save", async function (next) {
+  if (this.isModified("password") || this.isModified("email") || this.isNew) {
+    this.authInfoChangedAt = Date.now() - 1000;
+  }
+});
 
-// Compare Passwords 
-userSchema.methods.comparePassword = async function(candidatePassword) {
-  const user = this
-  const result = await bcrypt.compare(candidatePassword, user.password)
-  return result
-}
-
-
+// Compare Passwords
+userSchema.methods.comparePassword = async function (candidatePassword) {
+  const user = this;
+  const result = await bcrypt.compare(candidatePassword, user.password);
+  return result;
+};
 
 // Model : a wrapper for the schema, providing an interface to the database for CRUD operations.
 mongoose.models = {}; // for graphql bug
 export const User = mongoose.model("User", userSchema);
-

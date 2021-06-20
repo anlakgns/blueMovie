@@ -41,8 +41,26 @@ const useStyles = makeStyles(theme => ({
   avatar: {
     borderRadius:"50%",
   },
+  input:{
+    width:"100%",
+    borderRadius:"1em",
+    backgroundColor: theme.palette.common.weakBlack,
+    outline:"none",
+    border:"none",
+    padding:"0.2em",
+    paddingLeft:"1em",
+    paddingRight:"1em",
+    margin:"0.5em 0em",
+    height:"30px",
+    color: theme.palette.common.textWhite,
+    fontWeight:"bold",
+    "&::placeholder": {
+      color: theme.palette.common.textWhite,
+      fontWeight:"bold",
+      opacity:0.7
+    }
+  },
 }))
-
 
 const ProfileChangeModal = () => {
   const classes = useStyles()

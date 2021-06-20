@@ -1,11 +1,15 @@
 import { User } from "../models/User.js";
 import { AuthenticationError, ApolloError } from "apollo-server-micro";
+import bucket from "../firebase";
 import { isUserOwner } from "../utils/helpers";
 import { throwAuthError } from "../utils/helpers";
 import { generateToken } from "../utils/helpers";
 import { sendCookie } from "../utils/helpers";
 import { deleteCookie } from "../utils/helpers";
-import { authorizeAndGetId } from "../utils/authorize";
+import { authorizeAndDecode } from "../utils/authorize";
+import { isTokenUpToDate } from "../utils/helpers";
+import { v4 as uuidv4 } from 'uuid';
+
 
 // Resolvers for graphql
 export const resolvers = {
@@ -27,10 +31,10 @@ export const resolvers = {
     },
     user: async (parent, args, context, info) => {
       try {
-        const _id = authorizeAndGetId(context.req);
+        const { id } = authorizeAndDecode(context.req);
         const user = await User.findById(args.id);
 
-        if (_id !== user._id.toString()) {
+        if (id !== user._id.toString()) {
           throw new AuthenticationError("You don't own this user");
         }
         return user;
@@ -39,23 +43,42 @@ export const resolvers = {
       }
     },
     isAuth: async (parent, args, context, info) => {
-      try{
-        const _id = authorizeAndGetId(context.req);
+      try {
+        const { id, iat } = authorizeAndDecode(context.req);
 
+        const user = await User.findById(id);
+
+        // Controlling new token or not after password
+        // or email change.
+        const isTokenNew = isTokenUpToDate(iat, user);
+        if (!isTokenNew) {
+          throwAuthError("Please Login in again.");
+        }
+        console.log(user);
         return {
           isAuth: true,
-          _id: _id
-        }
+          _id: user._id,
+          email: user.email,
+          name: user.name,
+          lastname: user.lastname,
+          avatar: user.avatar,
+          phone: user.phone,
+          profiles: user.profiles,
+          plan: user.plan,
+        };
       } catch (err) {
-        throw (err) 
+        throw err;
       }
-    }
+    },
   },
 
   Mutation: {
     createUser: async (parent, args, context, info) => {
       try {
+        const tokenForFirebase =  uuidv4()
         // Validation Field Please
+
+        // Unique Email Check
         const checkEmail = await User.findOne({ email: args.fields.email });
         if (checkEmail) {
           throwAuthError(
@@ -66,21 +89,55 @@ export const resolvers = {
         // Creating Document
         const user = new User({
           name: args.fields.name,
+          lastname: args.fields.lastname,
+          phone: args.fields.phone,
           email: args.fields.email,
           password: args.fields.password,
-          passwordChangedAt: Date.now(),
+          avatar: `https://firebasestorage.googleapis.com/v0/b/bluemovie-2eaeb.appspot.com/o/${args.fields.email}-avatar?alt=media&token=${tokenForFirebase}`
         });
+
+        // Saving DB
+        const data = await user.save();
+        console.log(data);
+
+        // Saving Avatar to Storage
+        const { createReadStream, mimetype } = await args.fields.file;        
+        await new Promise(res => 
+          createReadStream()
+            .pipe(
+              bucket.file(`${user.email}-avatar`).createWriteStream({
+                resumable: false,
+                gzip: true,
+                public:true,
+                contentType: mimetype, 
+                metadata: {
+                  metadata :{
+                    firebaseStorageDownloadTokens: tokenForFirebase,
+                }
+              },
+              })
+            )
+            .on('error', function(err) {
+              console.log(err)
+            })
+            .on('finish', res)
+        )
 
         // Generate Token
         const token = generateToken(user._id);
 
-        // Saving DB
-        const data = await user.save();
-
         // Send Cookie
-        sendCookie(context.res, token)
+        sendCookie(context.res, token);
 
-        return { ...data._doc };
+        return {
+          _id: data._id,
+          email: data.email,
+          name: data.name,
+          lastname: data.lastname,
+          avatar: data.avatar,
+          profiles: data.profiles,
+          phone: data.phone,
+        };
       } catch (err) {
         throw err;
       }
@@ -88,7 +145,6 @@ export const resolvers = {
 
     loginUser: async (parent, args, context, info) => {
       try {
-        
         // Check the mail
         const user = await User.findOne({ email: args.fields.email });
         if (!user) {
@@ -105,34 +161,40 @@ export const resolvers = {
         const token = generateToken(user._id);
 
         // Send Cookie
-        sendCookie(context.res, token)
+        sendCookie(context.res, token);
 
         // Return
         return {
           _id: user._id,
           email: user.email,
-          name: user.name
+          name: user.name,
+          lastname: user.lastname,
+          avatar: user.avatar,
+          phone: user.phone,
+          profiles: user.profiles,
         };
       } catch (err) {
         throw err;
       }
     },
 
-    updateUser: async (parent, args, context, info) => {
+    updateUserInfo: async (parent, args, context, info) => {
       try {
         // Token & User Check
-        const _id = authorizeAndGetId(context.req);
-        const ownerCheck = isUserOwner(_id, args._id);
+        const { id } = authorizeAndDecode(context.req);
+        console.log(id, args.fields._id)
+        const ownerCheck = isUserOwner(id, args.fields._id);
         if (!ownerCheck) {
           throwAuthError("You don't have this user.");
         }
 
         // Validate Fields Please
         const user = await User.findByIdAndUpdate(
-          _id,
+          id,
           {
-            name: args.name,
-            lastname: args.lastname,
+            name: args.fields.name,
+            lastname: args.fields.lastname,
+            phone: args.fields.phone
           },
           {
             new: true,
@@ -140,61 +202,214 @@ export const resolvers = {
         );
 
         // generate new token
-        const token = generateToken(user._id)
+        const token = generateToken(user._id);
 
         // update cookie
-        sendCookie(context.res, token)
+        sendCookie(context.res, token);
 
         return { ...user._doc };
       } catch (err) {
         throw err;
       }
     },
-
-    updateUserEmailPass: async (parent, args, context, info) => {
+    updateUserEmail: async (parent, args, context, info) => {
       try {
-        // Token & User Check
-        const _id = authorizeAndGetId(context.req);
-        const ownerCheck = isUserOwner(_id, args._id);
-        if (!ownerCheck) {
-          throwAuthError("You don't have this user.");
+        // Token Exist Check
+        const { id, iat } = authorizeAndDecode(context.req);
+
+        // User Exist Check
+        const user = await User.findOne({ _id: id });
+        if (!user) {
+          throwAuthError("Sorry user couldn't found. Please try again.");
         }
 
-        const user = await User.findOne({ _id: args._id });
-        if (!user) throwAuthError("Sorry try again.");
+        // Check Password
+        const checkPassword = await user.comparePassword(args.fields.password);
+        if (!checkPassword) {
+          throwAuthError("Incorrect Password.");
+        }
 
-        // Validate Fields Please
-        if (args.email) {
-          user.email = args.email;
+        // Check the mail
+        const checkEmail = user.email === args.fields.email ? true : false;
+        if (!checkEmail) {
+          throwAuthError("Incorrect Email.");
         }
-        if (args.password) {
-          user.password = args.password;
+        // Check new email
+        const checkNewEmail = user.email === args.fields.newEmail;
+        if (checkNewEmail) {
+          throwAuthError("Please provide a new email.");
         }
+
+        // Controlling new token or not after password
+        // or email change.
+        const isTokenNew = isTokenUpToDate(iat, user);
+        if (!isTokenNew) {
+          throwAuthError("Please Login in again.");
+        }
+
+        // Updated Info
+        const userUpdate = await User.findByIdAndUpdate(
+          id,
+          {
+            email: args.fields.newEmail,
+          },
+          {
+            new: true,
+          }
+        );
+        console.log(userUpdate);
 
         // Generate token
         const token = generateToken(user._id);
 
-        // Saving DB
-        const data = await user.save();
+        // Send Cookie
+        sendCookie(context.res, token);
 
-        return { ...data._doc, token: token };
+        return {
+          _id: userUpdate._id,
+          email: userUpdate.email,
+          name: userUpdate.name,
+          lastname: userUpdate.lastname,
+          avatar: userUpdate.avatar,
+          phone: userUpdate.phone,
+          profiles: userUpdate.profiles,
+        };
       } catch (err) {
-        throw new ApolloError("Something went wrong.", err);
+        throwAuthError(err);
       }
     },
-
-    logoutUser: async (parent, args, context, info) => {
-       
+    updateUserPassword: async (parent, args, context, info) => {
       try {
-        deleteCookie(context.res)
-        return true
+        // Token Exist Check
+        const { id, iat } = authorizeAndDecode(context.req);
+        if (!id || !iat) {
+          throwAuthError("Sorry user couldn't found. Please try again.");
+        }
+
+        console.log(args)
+        // User Exist Check
+        const user = await User.findOne({ _id: id });
+        if (!user) {
+          throwAuthError("Sorry user couldn't found. Please try again.");
+        }
+
+        // Check Password
+        const checkPassword = await user.comparePassword(args.fields.password);
+        if (!checkPassword) {
+          throwAuthError("Incorrect Password.");
+        }
+
+        // Check new password
+        const checkNewEmail = user.password === args.fields.newPassword;
+        if (checkNewEmail) {
+          throwAuthError("Please provide a new password.");
+        }
+
+        // Controlling new token or not after password
+        // or email change.
+        const isTokenNew = isTokenUpToDate(iat, user);
+        if (!isTokenNew) {
+          throwAuthError("Please Login in again.");
+        }
+
+        // Updated Info
+         user.password = args.fields.newPassword
+         const data = await user.save();
+
+
+        // Generate token
+        const token = generateToken(user._id);
+
+        // Send Cookie
+        sendCookie(context.res, token);
+
+        return {
+          _id: data._id,
+          email: data.email,
+          name: data.name,
+          lastname: data.lastname,
+          avatar: data.avatar,
+          phone: data.phone,
+          profiles: data.profiles,
+        };
+      } catch (err) {
+        throwAuthError(err);
+      }
+    },
+    logoutUser: async (parent, args, context, info) => {
+      try {
+        deleteCookie(context.res);
+        return true;
       } catch (err) {
         throw new ApolloError("Something went wrong.", err);
       }
-    
     },
-  }
-}
+    singleUpload: async (parent, { file }, { req }) => {
+      try {
+
+        const { createReadStream, filename, mimetype } = await file;        
+        await new Promise(res => 
+          createReadStream()
+            .pipe(
+              bucket.file("avatars").createWriteStream({
+                resumable: false,
+                gzip: true,
+                public:true,
+                contentType: mimetype, 
+                metadata: {
+                  metadata :{
+                    firebaseStorageDownloadTokens: uuidv4(),
+                }
+              },
+              })
+            )
+            .on('error', function(err) {
+              console.log(err)
+            })
+            .on('finish', function(d) {
+              console.log(d)
+            })
+        )
+        
+        return { filename, mimetype, encoding, url: "" };
+      } catch (err) {
+        throw new ApolloError(err);
+      }
+    },
+    changePlan: async (parent, args, context, info) => {
+      try {
+
+        // Token & User Check
+        const { id } = authorizeAndDecode(context.req);
+        const ownerCheck = isUserOwner(id, args.fields._id);
+        if (!ownerCheck) {
+          throwAuthError("You don't have this user.");
+        }
+
+        // Validate Fields Please
+        const user = await User.findByIdAndUpdate(
+          id,
+          {
+            plan: args.fields.plan,
+          },
+          {
+            new: true,
+          }
+        );
+
+        // generate new token
+        const token = generateToken(user._id);
+
+        // update cookie
+        sendCookie(context.res, token);
+        return { newPlan: user.plan };
+      } catch (err) {
+        throw err;
+      }
+
+    }
+  },
+};
 
 
 
@@ -211,24 +426,60 @@ export const resolvers = {
 
 
 
+// var storage = require('@google-cloud/storage');
+// var gcs = storage({
+//     projectId: config.google.projectId,
+//     keyFilename: config.google.keyFilenameFirebase
+// });
 
+// var bucket = gcs.bucket('project-id.appspot.com');
+// var destination = 'uploads/12345/full.jpg';
 
-
-
-// isAuth: async (parent, args, context, info) => {
-//   try {
-//     const req = authorize(context.req, true)
-
-//     // Authorization Method Check
-//     if(!req._id) {
-//       throw new AuthenticationError("Bad token");
-
+// bucket.upload(myFile, { public: true, destination: destination }, function(err, file) {
+//     if (err) {
+//         console.log(err);
 //     }
-//     return {_id: req._id, email: req.email, token: req.token}
-//   }
-//   catch (err) {
-//     throw err
-//   }
-// },
+// });
+
+//  // console.log(avatarRef)
+//   bucket.upload(stream, { public: true, destination: "avatars/deniz.png" }, function(err, file) {
+//   if (err) {
+//  console.log(err);
+//  }
+
+// bucket.upload(
+//   "../../../public/images/avatarExample1.jpg",
+//     {
+//       destination: "avatars/deniz.png"
+//     },
+//   )
+
+// await new Promise((res) =>
+// createReadStream()
+//   .pipe(
+//     createWriteStream(
+//       path.join(process.cwd(), "public/images", filename)
+//     )
+//   )
+//   .on("close", res)
+// );
 
 
+
+// bucket.upload(buffers, 
+//   { public: true, 
+//     destination: `avatars/${filename}`,
+//     gzip: true, 
+//     contentType: "image/png", 
+//     metadata: {
+//       metadata :{
+//         firebaseStorageDownloadTokens: uuidv4(),
+//      }
+//   },
+//     }, 
+//   function(err, file) {
+//   if (err) {
+//       console.log(err);
+//   }
+// })
+// })

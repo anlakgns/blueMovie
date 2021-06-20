@@ -1,4 +1,4 @@
-import {useState} from "react"
+import {useState, useContext} from "react"
 
 import { Typography } from "@material-ui/core"
 import { Button } from "@material-ui/core"
@@ -8,6 +8,8 @@ import Dialog from '@material-ui/core/Dialog';
 
 import EmailChangeModal from "./Modals/EmailChangeModal"
 import PasswordChangeModal from "./Modals/PasswordChangeModal"
+import PlanChangeModal from "./Modals/PlanChangeModal"
+import {AuthContext} from "../../../shared/contexts/AuthContext"
 
 const useStyles = makeStyles(theme => ({
   main: {
@@ -44,12 +46,12 @@ const useStyles = makeStyles(theme => ({
   }
 }))
 
-
 const Membership = () => {
   const classes = useStyles()
+  const {authStates} = useContext(AuthContext)
   const [modalTracker, setModalTracker] = useState()
   const [modalOpen, setModalOpen] = useState(false)
-
+console.log(authStates)
 
   // Dom Handlers
   const handleEmail = () => {
@@ -60,10 +62,15 @@ const Membership = () => {
     setModalTracker("Password")
     setModalOpen(true)
   }
+  const handlePlan = () => {
+    setModalTracker("Plan")
+    setModalOpen(true)
+  }
   const modalClose = () => {
     setModalOpen(false)
   }
-
+  console.log(authStates)
+  
   return (
     <Grid 
       item container
@@ -88,7 +95,7 @@ const Membership = () => {
           <span className={classes.titleLine}>
             Email: &nbsp;
           </span> 
-          mariasimpsgon@gmail.com
+          {authStates.email}
         </Typography>
         <Button 
           className={classes.btnChange}
@@ -116,25 +123,7 @@ const Membership = () => {
           change password
         </Button>
       </Grid>
-      
-      {/* Phone */}
-      <Grid 
-        item container
-        justify="space-between"
-        alignItems="center"
-        className={classes.lineGrid}>
-        <Typography 
-          className={classes.lineText}>
-          <span className={classes.titleLine}>
-            Phone: &nbsp;
-          </span> 
-          +90 999 99 99
-        </Typography>
-        <Button className={classes.btnChange}>
-          change phone
-        </Button>
-      </Grid>
-     
+
       {/* Plan Details */}
       <Grid 
         item container
@@ -146,29 +135,35 @@ const Membership = () => {
           <span className={classes.titleLine}>
             Plan Details: &nbsp;
           </span> 
-          Basic
+          {authStates.plan}
         </Typography>
-        <Button className={classes.btnChange}>
+        <Button 
+          className={classes.btnChange}
+          onClick={handlePlan}>
           change plan
         </Button>
       </Grid>
       
+      {/* Edit Modals */}
       <Dialog 
         open={modalOpen}
         onClose={modalClose}
         classes={{paper: classes.dialogPaper}}>
         {
           modalTracker === "Email" ? 
-          <EmailChangeModal /> : 
+          <EmailChangeModal modalClose={modalClose} /> : 
           null
         }
         {
           modalTracker === "Password" ? 
-          <PasswordChangeModal /> : 
+          <PasswordChangeModal  modalClose={modalClose}/> : 
           null
         }
-
-        {/* <ProfileChangeModal /> */}
+        {
+          modalTracker === "Plan" ? 
+          <PlanChangeModal  modalClose={modalClose}/> : 
+          null
+        }
       </Dialog>
 
 

@@ -1,4 +1,4 @@
-import {useContext} from "react"
+import {useContext, useState} from "react"
 import Image from "next/image";
 import {useRouter} from "next/router"
 import {useMutation} from "@apollo/client"
@@ -12,9 +12,11 @@ import { makeStyles, useTheme } from "@material-ui/styles";
 import { Typography } from "@material-ui/core";
 import AddIcon from "@material-ui/icons/Add";
 import Hidden from '@material-ui/core/Hidden';
+import Dialog from '@material-ui/core/Dialog';
 
 import {LOGOUT} from "../../shared/apolloRequests"
 import {AuthContext} from "../../shared/contexts/AuthContext"
+import AccountChangeModal from "./AccountDetails/Modals/AccountChangeModal"
 
 const useStyles = makeStyles((theme) => ({
   editIcon: {
@@ -110,6 +112,10 @@ const useStyles = makeStyles((theme) => ({
     [theme.breakpoints.down("md")]: {
       marginLeft:"2em"
     }
+  },
+  dialogPaper:{
+    borderRadius:"2em",
+    backgroundColor: theme.palette.common.backgroundDark,
   }
 
 }));
@@ -118,7 +124,8 @@ export const Profile = () => {
   const classes = useStyles();
   const history = useRouter()
   const theme = useTheme()
-  const {setAuthStates} = useContext(AuthContext)
+  const [editModalOpen, setEditModalOpen] = useState(false)
+  const {setAuthStates, authStates} = useContext(AuthContext)
   const matchesMD = useMediaQuery(theme.breakpoints.down('md'))
   const matchesSM = useMediaQuery(theme.breakpoints.down('sm'))
   const [logoutUser, logoutResponse] = useMutation(LOGOUT,
@@ -143,6 +150,12 @@ export const Profile = () => {
   const handleLogout = () => {
     logoutUser()
   }
+  const handleEdit = () => {
+    setEditModalOpen(true)
+  }
+  const editModalClose = () => {
+    setEditModalOpen(false)
+  }
 
   return (
     <>
@@ -159,7 +172,7 @@ export const Profile = () => {
           
           {/** Edit Button **/}
           <Grid item container justify="flex-end">
-            <IconButton className={classes.btnEditIcon}>
+            <IconButton className={classes.btnEditIcon} onClick={handleEdit}>
               <EditIcon className={classes.editIcon} />
             </IconButton>
           </Grid>
@@ -168,7 +181,7 @@ export const Profile = () => {
           <Grid item container justify="center" className={classes.avatarGrid}>
             <Image
               className={classes.avatar}
-              src="/images/avatarExample1.jpg"
+              src={authStates.avatar}
               alt="profile picture"
               width={matchesSM ? 120 : 150}
               height={matchesSM ? 120 : 150}
@@ -177,7 +190,7 @@ export const Profile = () => {
 
           {/** Name & Duration **/}
           <Grid item container direction="column" alignItems="center">
-            <Typography className={classes.userName}>Maria Simpson</Typography>
+            <Typography className={classes.userName}>{authStates.name + " " + authStates.lastname}</Typography>
             <Typography className={classes.userDuration}>
               Member Since 10/03/2020
             </Typography>
@@ -207,6 +220,7 @@ export const Profile = () => {
                 profiles.map((profile,i) => {
                   return (
                     <Grid 
+                       key={i}
                       item container xs
                       justify="flex-start"
                       alignItems="center"
@@ -305,6 +319,14 @@ export const Profile = () => {
         </Button>
       
       </Grid>
+
+      {/* Edit Modal */}
+      <Dialog 
+        open={editModalOpen}
+        onClose={editModalClose}
+        classes={{paper: classes.dialogPaper}}>
+        <AccountChangeModal  modalClose={editModalClose}/>
+      </Dialog>
     </>
   );
 };
