@@ -14,9 +14,10 @@ import AddIcon from "@material-ui/icons/Add";
 import Hidden from '@material-ui/core/Hidden';
 import Dialog from '@material-ui/core/Dialog';
 
-import {LOGOUT} from "../../shared/apolloRequests"
-import {AuthContext} from "../../shared/contexts/AuthContext"
-import AccountChangeModal from "./AccountDetails/Modals/AccountChangeModal"
+import {LOGOUT} from "../../../shared/apolloRequests"
+import {AuthContext} from "../../../shared/contexts/AuthContext"
+import AccountChangeModal from "./Modals/AccountChangeModal"
+import ProfileAddModal from "./Modals/ProfileAddModal"
 
 const useStyles = makeStyles((theme) => ({
   editIcon: {
@@ -125,6 +126,7 @@ export const Profile = () => {
   const history = useRouter()
   const theme = useTheme()
   const [editModalOpen, setEditModalOpen] = useState(false)
+  const [addProfileModalOpen, setAddProfileModalOpen] = useState(false)
   const {setAuthStates, authStates} = useContext(AuthContext)
   const matchesMD = useMediaQuery(theme.breakpoints.down('md'))
   const matchesSM = useMediaQuery(theme.breakpoints.down('sm'))
@@ -143,7 +145,6 @@ export const Profile = () => {
         console.log(err)
       }
   })
-  const profiles = [1,1,1,1]
 
 
   // Dom Handlers
@@ -156,7 +157,12 @@ export const Profile = () => {
   const editModalClose = () => {
     setEditModalOpen(false)
   }
-
+  const addProfileModalClose = () => {
+    setAddProfileModalOpen(false)
+  }
+  const handleAddProfile = () => {
+    setAddProfileModalOpen(true)
+  }
   return (
     <>
       <Grid
@@ -217,7 +223,7 @@ export const Profile = () => {
               xs={10}
             >
               {
-                profiles.map((profile,i) => {
+                authStates.profiles.map((profile,i) => {
                   return (
                     <Grid 
                        key={i}
@@ -240,7 +246,7 @@ export const Profile = () => {
                       
                       <Hidden lgUp>
                         <Typography className={classes.profileName}>
-                          Brad
+                          {profile.name}
                         </Typography>
                       </Hidden>
                     </Grid>                   
@@ -248,7 +254,9 @@ export const Profile = () => {
                 })
               }
               
-              <IconButton className={classes.btnPlusIcon}>
+              <IconButton 
+                className={classes.btnPlusIcon}
+                onClick={handleAddProfile}>
                 <AddIcon className={classes.editIcon} />
               </IconButton>
             </Grid>
@@ -320,12 +328,21 @@ export const Profile = () => {
       
       </Grid>
 
-      {/* Edit Modal */}
-      <Dialog 
+       {/* Edit Modal */}
+       <Dialog 
         open={editModalOpen}
         onClose={editModalClose}
         classes={{paper: classes.dialogPaper}}>
         <AccountChangeModal  modalClose={editModalClose}/>
+      </Dialog>
+
+       {/* Add Profile Modal */}
+       <Dialog 
+        open={addProfileModalOpen}
+        onClose={addProfileModalClose}
+        classes={{paper: classes.dialogPaper}}>
+        <ProfileAddModal modalClose={addProfileModalClose} />
+
       </Dialog>
     </>
   );

@@ -10,6 +10,7 @@ import CardContent from "@material-ui/core/CardContent";
 import ErrorCard from "../../../../shared/UI Components/ErrorCard";
 import Snackbar from "@material-ui/core/Snackbar";
 import MuiAlert from "@material-ui/lab/Alert";
+import CircularProgress from "@material-ui/core/CircularProgress";
 
 import { AuthContext } from "../../../../shared/contexts/AuthContext";
 import { CHANGE_PLAN } from "../../../../shared/apolloRequests";
@@ -109,7 +110,6 @@ const ProfileChangeModal = ({ modalClose }) => {
   const handleCardButton = (plan) => {
     setSelectedPlan(plan);
   };
-  console.log(selectedPlan);
   const handleChangePlan = () => {
     changePlan({
       variables: {
@@ -230,13 +230,19 @@ const ProfileChangeModal = ({ modalClose }) => {
       </Grid>
 
       {/* Change Button */}
-      <Button
+      <Button 
         color="primary"
         variant="outlined"
+        type="submit"
         onClick={handleChangePlan}
         className={classes.btnChange}
-      >
-        Change Plan
+        >
+        {responseChangePlan.loading 
+          ? 
+          <CircularProgress color="secondary" />
+          : 
+          "Change Plan"
+        }
       </Button>
 
       <ErrorCard

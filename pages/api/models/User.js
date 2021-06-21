@@ -59,7 +59,7 @@ const userSchema = new Schema({
         type: String,
         default: "default.jpg",
       },
-      kid: {
+      kidProtection: {
         type: Boolean,
         default: false,
       },

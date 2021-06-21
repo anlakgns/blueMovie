@@ -1,14 +1,17 @@
-import {useState} from "react"
+import {useState, useContext} from "react"
 import Image from "next/image";
 
 import { Typography } from "@material-ui/core"
-import { Button, IconButton } from "@material-ui/core"
+import { IconButton } from "@material-ui/core"
 import Grid from "@material-ui/core/Grid"
 import {makeStyles} from "@material-ui/styles"
 import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 import EditIcon from '@material-ui/icons/Edit';
 import Dialog from '@material-ui/core/Dialog';
+
 import ProfileChangeModal from "./Modals/ProfileChangeModal"
+import ProfileDeleteModal from "./Modals/ProfileDeleteModal"
+import {AuthContext} from "../../../shared/contexts/AuthContext"
 
 const useStyles = makeStyles(theme => ({
   main: {
@@ -70,18 +73,29 @@ const useStyles = makeStyles(theme => ({
 
 const ProfileList = () => {
   const classes = useStyles()
-  const [modalOpen, setModalOpen] = useState(false)
-  const profiles=[1,1,1,1,1]
-
+  const {authStates} = useContext(AuthContext)
+  const [editModalOpen, setEditModalOpen] = useState(false)
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+  const [deletedProfileName, setDeletedProfilName] = useState("")
+  const [changedProfil, setChangedProfil] = useState("")
   // Dom Handlers
-  const modalClose = () => {
-    setModalOpen(false)
+  const editModalClose = () => {
+    setEditModalOpen(false)
   }
-  const handleDelete=() => {
+  const deleteModalClose = () => {
+    setDeleteModalOpen(false)
   }
-  const handleEdit = () => {
-    setModalOpen(true)
+  const handleDelete=(profileName) => {
+    setDeleteModalOpen(true)
+    setDeletedProfilName(profileName)
+
   }
+  const handleEdit = (profile) => {
+    setEditModalOpen(true)
+    setChangedProfil(profile)
+  }
+  
+  
   return (
     <Grid 
       item container
@@ -96,7 +110,7 @@ const ProfileList = () => {
       </Grid>
 
       {/* Profile Cards */}
-      {profiles.map((car, i) => {
+      {authStates.profiles.map((profile, i) => {
         return (
            <Grid 
               key={i}
@@ -118,20 +132,20 @@ const ProfileList = () => {
      
              {/** Profile Name **/}
              <Grid item  >
-               <Typography className={classes.profileName}>Brad</Typography>
+               <Typography className={classes.profileName}>{profile.name}</Typography>
              </Grid>
      
              {/** Icons  **/}
              <Grid item className={classes.iconsGrid}  >
                <IconButton 
                   classes={{root: classes.btnRoot}}
-                  onClick={handleDelete}>
+                  onClick={()=> {handleDelete(profile.name)}}>
                   <DeleteOutlineIcon className={classes.deleteIcon}/>
                </IconButton>
      
                <IconButton 
                   classes={{root: classes.btnRoot}}
-                  onClick={handleEdit}>
+                  onClick={()=> {handleEdit(profile)}}>
                   <EditIcon className={classes.editIcon}/>
                </IconButton>
              </Grid>
@@ -142,10 +156,18 @@ const ProfileList = () => {
 
       {/* Modals */}
       <Dialog 
-        open={modalOpen}
-        onClose={modalClose}
+        open={editModalOpen}
+        onClose={editModalClose}
         classes={{paper: classes.dialogPaper}}>
-        <ProfileChangeModal />
+        <ProfileChangeModal profil={changedProfil} modalClose={editModalClose} />
+
+      </Dialog>
+
+      <Dialog 
+        open={deleteModalOpen}
+        onClose={deleteModalClose}
+        classes={{paper: classes.dialogPaper}}>
+        <ProfileDeleteModal modalClose={deleteModalClose} profileName={deletedProfileName} />
 
       </Dialog>
         

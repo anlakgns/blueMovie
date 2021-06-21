@@ -54,7 +54,6 @@ export const resolvers = {
         if (!isTokenNew) {
           throwAuthError("Please Login in again.");
         }
-        console.log(user);
         return {
           isAuth: true,
           _id: user._id,
@@ -98,7 +97,6 @@ export const resolvers = {
 
         // Saving DB
         const data = await user.save();
-        console.log(data);
 
         // Saving Avatar to Storage
         const { createReadStream, mimetype } = await args.fields.file;        
@@ -142,7 +140,6 @@ export const resolvers = {
         throw err;
       }
     },
-
     loginUser: async (parent, args, context, info) => {
       try {
         // Check the mail
@@ -177,12 +174,10 @@ export const resolvers = {
         throw err;
       }
     },
-
     updateUserInfo: async (parent, args, context, info) => {
       try {
         // Token & User Check
         const { id } = authorizeAndDecode(context.req);
-        console.log(id, args.fields._id)
         const ownerCheck = isUserOwner(id, args.fields._id);
         if (!ownerCheck) {
           throwAuthError("You don't have this user.");
@@ -257,7 +252,6 @@ export const resolvers = {
             new: true,
           }
         );
-        console.log(userUpdate);
 
         // Generate token
         const token = generateToken(user._id);
@@ -286,7 +280,6 @@ export const resolvers = {
           throwAuthError("Sorry user couldn't found. Please try again.");
         }
 
-        console.log(args)
         // User Exist Check
         const user = await User.findOne({ _id: id });
         if (!user) {
@@ -407,6 +400,105 @@ export const resolvers = {
         throw err;
       }
 
+    },
+    addProfile: async (parent, args, context, info) => {
+      try {
+
+        // Token & User Check
+        const { id } = authorizeAndDecode(context.req);
+        const ownerCheck = isUserOwner(id, args.fields._id);
+        if (!ownerCheck) {
+          throwAuthError("You don't have this user.");
+        }
+
+        // User Exist Check
+        const user = await User.findOne({ _id: id });
+        if (!user) {
+          throwAuthError("Sorry user couldn't found. Please try again.");
+        }
+
+        // Adding to Profile
+        user.profiles.push({
+          name: args.fields.name,
+          kidProtection: args.fields.kidProtection,
+          avatar: args.fields.avatar 
+        })
+
+        // Saving to DB
+        const data = await user.save();
+
+        return { profiles: data.profiles };
+      } catch (err) {
+        throw err;
+      }
+    },
+    deleteProfile: async (parent, args, context, info) => {
+      try {
+
+        // Token & User Check
+        const { id } = authorizeAndDecode(context.req);
+        const ownerCheck = isUserOwner(id, args.fields._id);
+        if (!ownerCheck) {
+          throwAuthError("You don't have this user.");
+        }
+
+        // User Exist Check
+        const user = await User.findOne({ _id: id });
+        if (!user) {
+          throwAuthError("Sorry user couldn't found. Please try again.");
+        }
+
+        // Adding to Profile
+        const newProfiles = user.profiles.filter(profile => profile.name !== args.fields.name)
+        user.profiles = newProfiles
+
+        // Saving to DB
+        const data = await user.save();
+
+        return { profiles: data.profiles };
+      } catch (err) {
+        throw err;
+      }
+    },
+    changeProfile:  async (parent, args, context, info) => {
+      try {
+        // Token & User Check
+        const { id } = authorizeAndDecode(context.req);
+        const ownerCheck = isUserOwner(id, args.fields._id);
+        if (!ownerCheck) {
+          throwAuthError("You don't have this user.");
+        }
+
+         // User Exist Check
+         const user = await User.findOne({ _id: id });
+         if (!user) {
+           throwAuthError("Sorry user couldn't found. Please try again.");
+         }
+
+         console.log(user.profiles)
+         console.log(args.fields)
+        // Updating Profile
+        const profileIndex = user.profiles.findIndex(profile => profile._id.toString() === args.fields.profileId
+        )
+     
+
+        // Check Profile
+        if (profileIndex === -1) {
+          throwAuthError("Profile couldn't found.");
+        }
+        
+
+        user.profiles[profileIndex].name = args.fields.name
+        user.profiles[profileIndex].kidProtection = args.fields.kidProtection
+
+        // Saving to DB
+        const data = await user.save();
+
+
+        return { profiles: data.profiles };
+      } catch (err) {
+        throw err;
+      }
     }
   },
 };

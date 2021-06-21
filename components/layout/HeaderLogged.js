@@ -134,7 +134,7 @@ const useStyles = makeStyles((theme) => ({
 const HeaderLogged = () => {
   const classes = useStyles();
   const history = useRouter()
-  const {setAuthStates} = useContext(AuthContext)
+  const {setAuthStates, authStates} = useContext(AuthContext)
   const matches860 = useMediaQuery("(max-width:860px)");
   const matches760 = useMediaQuery("(max-width:760px)");
   const [anchorMenu, setAnchorMenu] = useState(null);
@@ -310,85 +310,38 @@ const HeaderLogged = () => {
         className={classes.menu}
       >
         {/* Profile Part - map will be used soon. */}
-        <MenuItem
-          onClick={handleMenuClose}
-          classes={{ root: classes.menuItemProfileRoot }}
-        >
-          <Grid item container justify="flex-start" alignItems="center">
-            <Grid item>
-              <Button
-                className={classes.btn}
-                classes={{ root: classes.btnRoot }}
-                onClick={handleMenuClick}
-              >
-                <Image
-                  src="/images/avatarExample1.jpg"
-                  alt="avatar"
-                  width={45}
-                  height={45}
-                  layout="intrinsic"
-                  className={classes.avatar}
-                />
-              </Button>
-            </Grid>
-            <Grid item>
-              <Typography className={classes.profileName}>Jessica</Typography>
-            </Grid>
-          </Grid>
-        </MenuItem>
-        <MenuItem
-          onClick={handleMenuClose}
-          classes={{ root: classes.menuItemProfileRoot }}
-        >
-          <Grid item container justify="flex-start" alignItems="center">
-            <Grid item>
-              <Button
-                className={classes.btn}
-                classes={{ root: classes.btnRoot }}
-                onClick={handleMenuClick}
-              >
-                <Image
-                  src="/images/avatarExample1.jpg"
-                  alt="avatar"
-                  width={45}
-                  height={45}
-                  layout="intrinsic"
-                  className={classes.avatar}
-                />
-              </Button>
-            </Grid>
-            <Grid item>
-              <Typography className={classes.profileName}>Brad</Typography>
-            </Grid>
-          </Grid>
-        </MenuItem>
-        <MenuItem
-          onClick={handleMenuClose}
-          classes={{ root: classes.menuItemProfileRoot }}
-        >
-          <Grid item container justify="flex-start" alignItems="center">
-            <Grid item>
-              <Button
-                className={classes.btn}
-                classes={{ root: classes.btnRoot }}
-                onClick={handleMenuClick}
-              >
-                <Image
-                  src="/images/avatarExample1.jpg"
-                  alt="avatar"
-                  width={45}
-                  height={45}
-                  layout="intrinsic"
-                  className={classes.avatar}
-                />
-              </Button>
-            </Grid>
-            <Grid item>
-              <Typography className={classes.profileName}>Maria</Typography>
-            </Grid>
-          </Grid>
-        </MenuItem>
-
+        {authStates.profiles.map((profile, i) => {
+          return (
+            <MenuItem
+              key={i}
+              onClick={handleMenuClose}
+              classes={{ root: classes.menuItemProfileRoot }}
+            >
+              <Grid item container justify="flex-start" alignItems="center">
+                <Grid item>
+                  <Button
+                    className={classes.btn}
+                    classes={{ root: classes.btnRoot }}
+                    onClick={handleMenuClick}
+                  >
+                    <Image
+                      src="/images/avatarExample1.jpg"
+                      alt="avatar"
+                      width={45}
+                      height={45}
+                      layout="intrinsic"
+                      className={classes.avatar}
+                    />
+                  </Button>
+                </Grid>
+                <Grid item>
+                  <Typography className={classes.profileName}>{profile.name}</Typography>
+                </Grid>
+              </Grid>
+            </MenuItem>
+          )
+        })}
+       
         {/* Link Part */}
         <MenuItem>
           <div className={classes.underline} />

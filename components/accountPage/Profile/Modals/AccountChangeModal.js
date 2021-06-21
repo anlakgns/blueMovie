@@ -130,11 +130,13 @@ const AccountChangeModal = ({modalClose}) => {
       })
     }
   })
-console.log(authStates)
- // Dom Handlers
- const handlerErrorModalClose = () => {
-  setErrorModalOpen(false);
-};
+  
+  console.log(authStates)
+ 
+  // Dom Handlers
+   const handlerErrorModalClose = () => {
+    setErrorModalOpen(false);
+  };
 
   return (
     <Grid 

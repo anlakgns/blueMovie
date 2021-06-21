@@ -35,6 +35,12 @@ export const ISAUTH = gql`
       avatar
       phone 
       plan
+      profiles {
+        name,
+        avatar,
+        kidProtection,
+        _id
+      }
     } 
   }
 `;
@@ -73,6 +79,42 @@ export const CHANGE_PLAN = gql`
   mutation changePlan($fields: ChangePlanInput! ) {
     changePlan(fields: $fields) {
       newPlan
+    }
+  }
+`
+export const ADD_PROFILE = gql`
+  mutation addProfile($fields: addProfileInput! ) {
+    addProfile(fields: $fields) {
+      profiles {
+        _id,
+        name,
+        avatar,
+        kidProtection
+      }
+    }
+  }
+`
+export const DELETE_PROFILE = gql`
+  mutation deleteProfile($fields: deleteProfileInput! ) {
+    deleteProfile(fields: $fields) {
+      profiles {
+        name,
+        avatar,
+        kidProtection
+        _id
+      }
+    }
+  }
+`
+export const CHANGE_PROFILE = gql`
+  mutation changeProfile($fields: changeProfileInput!) {
+    changeProfile(fields: $fields) {
+      profiles {
+        name,
+        avatar,
+        kidProtection
+        _id
+      }
     }
   }
 `

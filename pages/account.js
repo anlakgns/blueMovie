@@ -3,7 +3,7 @@ import {useState, useContext} from "react"
 import Grid from "@material-ui/core/Grid"
 import {makeStyles} from "@material-ui/styles"
 
-import {Profile} from "../components/accountPage/Profile"
+import {Profile} from "../components/accountPage/Profile/Profile"
 import {MovieList} from "../components/accountPage/MovieList"
 import OptionBar from "../components/accountPage/OptionBar"
 

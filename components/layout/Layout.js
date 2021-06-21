@@ -36,13 +36,14 @@ const Layout = ({ children }) => {
           password: data?.isAuth.passwordConfirm,
           plan: data?.isAuth.plan,
           avatar: data?.isAuth.avatar,
-          userId: data?.isAuth._id
+          userId: data?.isAuth._id,
+          profiles: data?.isAuth.profiles
         }
       })
     }
 
   },[loading,error,data])
-
+console.log(authStates)
   return (
       <>
         {authStates.isAuth ? (

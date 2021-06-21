@@ -17,6 +17,9 @@ export const typeDefs = gql`
     logoutUser: Boolean!
     singleUpload(file: Upload!): UploadedFileResponse!
     changePlan(fields: ChangePlanInput!) : ChangePlan!
+    addProfile(fields: addProfileInput!) : addProfile!
+    deleteProfile(fields: deleteProfileInput!) : addProfile!
+    changeProfile(fields: changeProfileInput!) : addProfile!
   }
 
   type User {
@@ -31,15 +34,40 @@ export const typeDefs = gql`
     plan: String!
   }
 
+  input deleteProfileInput {
+    name: String!
+    _id: ID!
+  }
+
+  input changeProfileInput {
+    _id: ID!
+    name: String
+    kidProtection:Boolean
+    profileId: ID!
+    avatar: String
+  }
+
   input ChangePlanInput {
     plan: String!
     _id: ID!
   }
 
-  type Profile {
+  input addProfileInput {
+    _id: ID!
     name: String!
     avatar: String
-    kid: Boolean
+    kidProtection: Boolean!
+  }
+
+  type addProfile {
+    profiles: [Profile!]
+  }
+
+  type Profile {
+    _id: ID!
+    name: String!
+    avatar: String
+    kidProtection: Boolean!
   }
 
   input UserSignUpInput {
@@ -69,6 +97,7 @@ export const typeDefs = gql`
     _id: ID!
   }
 
+
   input UserUpdatePasswordInput {
     password: String!
     newPassword: String!
@@ -89,12 +118,13 @@ export const typeDefs = gql`
     phone:String
     avatar: String
     plan: String!
+    profiles: [Profile!]
   }
 
   type UploadedFileResponse {
-      filename: String
-      mimetype: String
-      encoding: String
-      url: String
+    filename: String
+    mimetype: String
+    encoding: String
+    url: String
     }
 `;
