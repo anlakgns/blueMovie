@@ -310,7 +310,7 @@ const HeaderLogged = () => {
         className={classes.menu}
       >
         {/* Profile Part - map will be used soon. */}
-        {authStates.profiles.map((profile, i) => {
+        {authStates.profiles?.map((profile, i) => {
           return (
             <MenuItem
               key={i}
@@ -325,7 +325,7 @@ const HeaderLogged = () => {
                     onClick={handleMenuClick}
                   >
                     <Image
-                      src="/images/avatarExample1.jpg"
+                      src={profile.avatar || "/images/DefaultProfil.svg"}
                       alt="avatar"
                       width={45}
                       height={45}

@@ -44,7 +44,8 @@ export const typeDefs = gql`
     name: String
     kidProtection:Boolean
     profileId: ID!
-    avatar: String
+    file: Upload
+    lastModified: String
   }
 
   input ChangePlanInput {
@@ -55,7 +56,8 @@ export const typeDefs = gql`
   input addProfileInput {
     _id: ID!
     name: String!
-    avatar: String
+    file: Upload
+    lastModified: String
     kidProtection: Boolean!
   }
 
@@ -77,12 +79,16 @@ export const typeDefs = gql`
     phone:String
     password: String!
     file: Upload!
+    lastModified: String
+
   }
 
   input UserUpdateInfoInput {
     name: String
     lastname: String
     phone:String
+    file: Upload
+    lastModified: String
     _id: ID!
   }
 

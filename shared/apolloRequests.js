@@ -71,7 +71,8 @@ export const CHANGE_INFO = gql`
     updateUserInfo(fields: $fields) {
       name
       lastname
-      phone
+      phone,
+      avatar,
     }
   }
 `

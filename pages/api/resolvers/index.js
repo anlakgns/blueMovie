@@ -92,9 +92,11 @@ export const resolvers = {
           phone: args.fields.phone,
           email: args.fields.email,
           password: args.fields.password,
-          avatar: `https://firebasestorage.googleapis.com/v0/b/bluemovie-2eaeb.appspot.com/o/${args.fields.email}-avatar?alt=media&token=${tokenForFirebase}`
-        });
-
+          avatar: args.fields.file ? `https://firebasestorage.googleapis.com/v0/b/bluemovie-2eaeb.appspot.com/o/${args.fields.email.replace("@", "%40")}-avatar%3Flastmod%3D${args.fields.lastModified}?alt=media&token=ca440441-89d3-4f14-a8c0-f2a226c208a9`
+          : null
+      })
+       
+       
         // Saving DB
         const data = await user.save();
 
@@ -103,7 +105,7 @@ export const resolvers = {
         await new Promise(res => 
           createReadStream()
             .pipe(
-              bucket.file(`${user.email}-avatar`).createWriteStream({
+              bucket.file(`${user.email}-avatar?lastmod=${args.fields.lastModified}`).createWriteStream({
                 resumable: false,
                 gzip: true,
                 public:true,
@@ -183,13 +185,50 @@ export const resolvers = {
           throwAuthError("You don't have this user.");
         }
 
+        // User Exist Check
+        const userCheck = await User.findOne({ _id: id });
+        if (!userCheck) {
+          throwAuthError("Sorry user couldn't found. Please try again.");
+        }
+
+         // Saving Avatar to Storage
+         const tokenForFirebase =  uuidv4()
+         if(args.fields.file) {
+          const { createReadStream, mimetype } = await args.fields.file;
+          console.log(args.fields.file)        
+          await new Promise(res => 
+            createReadStream()
+              .pipe(
+                bucket.file(`${userCheck.email}-avatar?lastmod=${args.fields.lastModified}`).createWriteStream({
+                  resumable: false,
+                  gzip: true,
+                  public:true,
+                  contentType: mimetype, 
+                  metadata: {
+                    metadata :{
+                      firebaseStorageDownloadTokens: tokenForFirebase,
+                  }
+                },
+                })
+              )
+              .on('error', function(err) {
+                console.log(err)
+              })
+              .on('finish', res)
+          )
+         }
+         
+
         // Validate Fields Please
         const user = await User.findByIdAndUpdate(
           id,
           {
             name: args.fields.name,
             lastname: args.fields.lastname,
-            phone: args.fields.phone
+            phone: args.fields.phone,
+            avatar: args.fields.file ? `https://firebasestorage.googleapis.com/v0/b/bluemovie-2eaeb.appspot.com/o/${userCheck.email.replace("@", "%40")}-avatar%3Flastmod%3D${args.fields.lastModified}?alt=media&token=ca440441-89d3-4f14-a8c0-f2a226c208a9`
+          : userCheck.avatar
+            
           },
           {
             new: true,
@@ -417,11 +456,39 @@ export const resolvers = {
           throwAuthError("Sorry user couldn't found. Please try again.");
         }
 
+        // Saving Avatar to Storage
+        const tokenForFirebase =  uuidv4()
+        if(args.fields.file) {
+         const { createReadStream, mimetype } = await args.fields.file;
+         console.log(args.fields.file)        
+         await new Promise(res => 
+           createReadStream()
+             .pipe(
+               bucket.file(`${user.email}-profil?lastmod=${args.fields.lastModified}?profilName=${args.fields.name}`).createWriteStream({
+                 resumable: false,
+                 gzip: true,
+                 public:true,
+                 contentType: mimetype, 
+                 metadata: {
+                   metadata :{
+                     firebaseStorageDownloadTokens: tokenForFirebase,
+                 }
+               },
+               })
+             )
+             .on('error', function(err) {
+               console.log(err)
+             })
+             .on('finish', res)
+         )
+        }
+
         // Adding to Profile
         user.profiles.push({
           name: args.fields.name,
           kidProtection: args.fields.kidProtection,
-          avatar: args.fields.avatar 
+          avatar: args.fields.file ? `https://firebasestorage.googleapis.com/v0/b/bluemovie-2eaeb.appspot.com/o/${user.email.replace("@", "%40")}-profil%3Flastmod%3D${args.fields.lastModified}%3FprofilName%3D${args.fields.name}?alt=media&token=ca440441-89d3-4f14-a8c0-f2a226c208a9`
+          : null
         })
 
         // Saving to DB
@@ -486,10 +553,40 @@ export const resolvers = {
         if (profileIndex === -1) {
           throwAuthError("Profile couldn't found.");
         }
+
+        // Saving Avatar to Storage
+        const tokenForFirebase =  uuidv4()
+        if(args.fields.file) {
+         const { createReadStream, mimetype } = await args.fields.file;
+         console.log(args.fields.file)        
+         await new Promise(res => 
+           createReadStream()
+             .pipe(
+               bucket.file(`${user.email}-profil?lastmod=${args.fields.lastModified}?profilName=${args.fields.name}`).createWriteStream({
+                 resumable: false,
+                 gzip: true,
+                 public:true,
+                 contentType: mimetype, 
+                 metadata: {
+                   metadata :{
+                     firebaseStorageDownloadTokens: tokenForFirebase,
+                 }
+               },
+               })
+             )
+             .on('error', function(err) {
+               console.log(err)
+             })
+             .on('finish', res)
+         )
+        }
         
 
         user.profiles[profileIndex].name = args.fields.name
         user.profiles[profileIndex].kidProtection = args.fields.kidProtection
+        user.profiles[profileIndex].avatar = args.fields.file ? `https://firebasestorage.googleapis.com/v0/b/bluemovie-2eaeb.appspot.com/o/${user.email.replace("@", "%40")}-profil%3Flastmod%3D${args.fields.lastModified}%3FprofilName%3D${args.fields.name}?alt=media&token=ca440441-89d3-4f14-a8c0-f2a226c208a9`
+          : null
+        
 
         // Saving to DB
         const data = await user.save();
@@ -575,3 +672,8 @@ export const resolvers = {
 //   }
 // })
 // })
+
+
+
+
+

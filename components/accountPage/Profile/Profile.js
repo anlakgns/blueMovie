@@ -189,6 +189,7 @@ export const Profile = () => {
               className={classes.avatar}
               src={authStates.avatar}
               alt="profile picture"
+              placeholder="blur"
               width={matchesSM ? 120 : 150}
               height={matchesSM ? 120 : 150}
             />
@@ -223,7 +224,7 @@ export const Profile = () => {
               xs={10}
             >
               {
-                authStates.profiles.map((profile,i) => {
+                authStates.profiles?.map((profile,i) => {
                   return (
                     <Grid 
                        key={i}
@@ -237,7 +238,7 @@ export const Profile = () => {
                         <Image
                         key={i}
                         className={classes.profileAvatars}
-                        src="/images/avatarExample1.jpg"
+                        src={profile.avatar || "/images/DefaultProfil.svg"}
                         alt="profile picture"
                         width={40}
                         height={40}

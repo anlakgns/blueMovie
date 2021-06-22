@@ -158,6 +158,8 @@ const AuthForm = () => {
               email: values.email,
               password: values.passwordConfirm,
               file: values.avatar,
+              lastModified: values.avatar.lastModified.toString()
+
             },
           },
         });

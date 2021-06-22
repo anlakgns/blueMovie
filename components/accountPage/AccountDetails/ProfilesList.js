@@ -123,7 +123,7 @@ const ProfileList = () => {
              <Grid item className={classes.profileAvatarsGrid}>
                <Image
                className={classes.profileAvatars}
-               src="/images/avatarExample1.jpg"
+               src={profile.avatar || "/images/DefaultProfil.svg"}
                alt="profile picture"
                width={50}
                height={50}
