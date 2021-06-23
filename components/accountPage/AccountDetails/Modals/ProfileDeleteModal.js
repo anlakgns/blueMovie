@@ -1,6 +1,4 @@
 import React, { useState, useContext } from "react";
-import { useFormik } from "formik";
-import * as Yup from "yup";
 import { useMutation } from "@apollo/client"
 
 import { Typography } from "@material-ui/core"
@@ -8,16 +6,12 @@ import { Button } from "@material-ui/core"
 import Grid from "@material-ui/core/Grid"
 import {makeStyles} from "@material-ui/styles"
 import CircularProgress from "@material-ui/core/CircularProgress";
-import Snackbar from '@material-ui/core/Snackbar';
-import MuiAlert from '@material-ui/lab/Alert';
+import FeedbackBar from "../../../../shared/UI Components/FeedbackBar";
 
 import {DELETE_PROFILE} from "../../../../shared/apolloRequests"
 import {AuthContext} from "../../../../shared/contexts/AuthContext"
 import ErrorCard from "../../../../shared/UI Components/ErrorCard";
 
-function Alert(props) {
-  return <MuiAlert elevation={6} variant="filled" {...props} />;
-}
 const useStyles = makeStyles(theme => ({
   main: {
     color: theme.palette.common.textWhite,
@@ -71,7 +65,6 @@ const useStyles = makeStyles(theme => ({
   }
 }))
 
-
 const ProfileDeleteModal = ({modalClose, profileName}) => {
   const classes = useStyles()
   const [errorModalOpen, setErrorModalOpen] = useState(false);
@@ -112,7 +105,6 @@ const ProfileDeleteModal = ({modalClose, profileName}) => {
       }
     })
   }
-
   return (
     <Grid 
       item container
@@ -126,14 +118,14 @@ const ProfileDeleteModal = ({modalClose, profileName}) => {
         </Typography>
       </Grid>
 
+      {/* Sure Question */}
       <Grid item>
         <Typography className={classes.text}>
-          Are You Sure ?
+          {`Are you sure to delete the profil : ${profileName} ?`}
         </Typography>
       </Grid>
 
-
- 
+      {/* Buttons */}
       <Grid 
         item container>
         {/* Change Button */}
@@ -159,7 +151,8 @@ const ProfileDeleteModal = ({modalClose, profileName}) => {
               No
           </Button>
       </Grid>
-            
+
+      {/* Feedback & Error UI */}
       <ErrorCard
         open={errorModalOpen}
         onClose={handlerErrorModalClose}
@@ -167,15 +160,10 @@ const ProfileDeleteModal = ({modalClose, profileName}) => {
         headline={"Error"}
         btnContext="Okey"
       />
-      <Snackbar 
+      <FeedbackBar
         open={Boolean(responseDeleteProfile.data && !responseDeleteProfile.error)} 
-        autoHideDuration={1500} 
-        anchorOrigin={{ vertical: "top", horizontal:"center" }}
-        >
-        <Alert  severity="success">
-          The profile succesfully deleted.
-        </Alert>
-      </Snackbar>
+        message={"Profile Succesfully Deleted.."}
+      />
 
     </Grid>
   )

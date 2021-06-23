@@ -187,7 +187,7 @@ export const Profile = () => {
           <Grid item container justify="center" className={classes.avatarGrid}>
             <Image
               className={classes.avatar}
-              src={authStates.avatar}
+              src={authStates.avatar || "/images/DefaultProfil.svg"}
               alt="profile picture"
               placeholder="blur"
               width={matchesSM ? 120 : 150}
@@ -227,7 +227,7 @@ export const Profile = () => {
                 authStates.profiles?.map((profile,i) => {
                   return (
                     <Grid 
-                       key={i}
+                       key={`${profile.name}${i}`}
                       item container xs
                       justify="flex-start"
                       alignItems="center"
@@ -236,7 +236,6 @@ export const Profile = () => {
                         item 
                         className={classes.profileAvatarsGrid}>
                         <Image
-                        key={i}
                         className={classes.profileAvatars}
                         src={profile.avatar || "/images/DefaultProfil.svg"}
                         alt="profile picture"

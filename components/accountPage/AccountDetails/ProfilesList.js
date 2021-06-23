@@ -78,6 +78,7 @@ const ProfileList = () => {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
   const [deletedProfileName, setDeletedProfilName] = useState("")
   const [changedProfil, setChangedProfil] = useState("")
+  
   // Dom Handlers
   const editModalClose = () => {
     setEditModalOpen(false)
@@ -119,7 +120,7 @@ const ProfileList = () => {
              justify="space-around"
              alignItems="center">
      
-             {/* Avatar */}
+             {/** Avatar **/}
              <Grid item className={classes.profileAvatarsGrid}>
                <Image
                className={classes.profileAvatars}
@@ -162,7 +163,6 @@ const ProfileList = () => {
         <ProfileChangeModal profil={changedProfil} modalClose={editModalClose} />
 
       </Dialog>
-
       <Dialog 
         open={deleteModalOpen}
         onClose={deleteModalClose}
@@ -171,7 +171,6 @@ const ProfileList = () => {
 
       </Dialog>
         
-      
     </Grid>
   )
 }

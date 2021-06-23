@@ -1,27 +1,19 @@
 import { useContext, useState, useEffect } from "react";
-import Image from "next/image";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useMutation } from "@apollo/client";
 
 import { Typography } from "@material-ui/core";
-import { Button } from "@material-ui/core";
 import Grid from "@material-ui/core/Grid";
 import { makeStyles } from "@material-ui/styles";
-import Snackbar from "@material-ui/core/Snackbar";
-import MuiAlert from "@material-ui/lab/Alert";
-import EditIcon from "@material-ui/icons/Edit";
-import Input from "@material-ui/core/Input";
-import { InputLabel } from '@material-ui/core';
-import CircularProgress from "@material-ui/core/CircularProgress";
 
 import { CHANGE_INFO } from "../../../../shared/apolloRequests";
 import { AuthContext } from "../../../../shared/contexts/AuthContext";
 import ErrorCard from "../../../../shared/UI Components/ErrorCard";
-
-function Alert(props) {
-  return <MuiAlert elevation={6} variant="filled" {...props} />;
-}
+import FeedbackBar from "../../../../shared/UI Components/FeedbackBar";
+import AvatarForm from "../../../../shared/UI Components/AvatarForm";
+import ButtonForm from "../../../../shared/UI Components/ButtonForm";
+import InputForm from "../../../../shared/UI Components/InputForm";
 
 const useStyles = makeStyles((theme) => ({
   main: {
@@ -37,82 +29,6 @@ const useStyles = makeStyles((theme) => ({
     fontWeight: "bold",
     marginBottom: "1em",
   },
-  lineGrid: {
-    padding: "0.2em",
-    paddingLeft: "1em",
-    paddingRight: "1em",
-    backgroundColor: theme.palette.common.weakBlack,
-    margin: "0.5em 0em",
-    borderRadius: "1em",
-  },
-  lineText: {
-    fontWeight: "bold",
-  },
-  btnChange: {
-    color: "white",
-    width: "15em",
-    marginTop: "2em",
-    marginBottom: "1em",
-    [theme.breakpoints.down("md")]: {
-      width: "12em",
-    },
-  },
-  avatar: {
-    borderRadius: "50%",
-    overflow: "hidden",
-  },
-  input: {
-    width: "100%",
-    borderRadius: "1em",
-    backgroundColor: theme.palette.common.weakBlack,
-    outline: "none",
-    border: "none",
-    padding: "0.2em",
-    paddingLeft: "1em",
-    paddingRight: "1em",
-    margin: "0.5em 0em",
-    height: "30px",
-    color: theme.palette.common.textWhite,
-    fontWeight: "bold",
-    "&::placeholder": {
-      color: theme.palette.common.textWhite,
-      fontWeight: "bold",
-      opacity: 0.7,
-    },
-  },
-  iconAvatar: {
-    borderRadius: "50%",
-    height: "150px",
-    maxWidth: "150px",
-    overflow: "hidden",
-    position: "relative",
-    "&:hover": {
-      "& $editIcon": {
-        color: "purple",
-        height: "40px",
-        paddingTop: "0.4em",
-        transition: "height 1s ease",
-      },
-    },
-
-  },
-  editIcon: {
-    position: "absolute",
-    overflow: "hidden",
-    bottom: 0,
-    color: theme.palette.common.purple,
-    backgroundColor: theme.palette.common.weakBlack,
-    width: "100%",
-    margin: "auto",
-    height: "0px",
-    textAlign: "center",
-  },
-  inputRoot:{
-    display:"none"
-  },
-  inputLabel:{
-    cursor:"pointer"
-  }
 }));
 
 const AccountChangeModal = ({ modalClose }) => {
@@ -159,16 +75,19 @@ const AccountChangeModal = ({ modalClose }) => {
         variables: {
           fields: {
             _id: authStates.userId,
-            name: values.name || authStates.name,
-            lastname: values.lastname || authStates.lastname,
-            phone: values.phone || authStates.phone,
+            name: values.name,
+            lastname: values.lastname,
+            phone: values.phone,
             file: values.avatar,
-            lastModified: values.avatar?.lastModified.toString() || null
+            lastModified: values.avatar?.lastModified.toString()
           },
         },
       });
     },
   });
+
+  console.log(formik.initialValues)
+  console.log(formik.values)
 
   // Image Upload Preview
   useEffect(() => {
@@ -184,15 +103,10 @@ const AccountChangeModal = ({ modalClose }) => {
 
   },[formik.values.avatar])
   
-
   // Dom Handlers
   const handlerErrorModalClose = () => {
     setErrorModalOpen(false);
   };
-  const handlePhotoInput = (event) => {
-      formik.setFieldValue("avatar", event.currentTarget.files[0]);
-  }
-  
 
   return (
     <Grid item container className={classes.main} direction="column">
@@ -201,125 +115,71 @@ const AccountChangeModal = ({ modalClose }) => {
         <Typography className={classes.headline}>Account Change</Typography>
       </Grid>
 
+      {/* Form */}
       <form onSubmit={formik.handleSubmit}>
-        {/* Avatar & Inputs */}
+        
+        {/**  Avatar & Inputs **/}
         <Grid item container direction="row">
-          {/** Avatar **/}
+          
+          {/*** Avatar ***/}
           <Grid
             item
             container
             justify="center"
             xs={4}
           >
-            <Grid
-              item
-              container
-              justify="center"
-              className={classes.iconAvatar}
-            >
-              <Image
-                className={classes.avatar}
-                src={localImageURL ||  authStates.avatar}
-                alt="profile picture"
-                width={150}
-                height={150}
-              />
-              <div className={classes.editIcon}>
-                <InputLabel htmlFor="avatar" focused={true} className={classes.inputLabel}>
-                    <EditIcon />
-                </InputLabel>
-                <Input
-                  classes={{
-                    input: classes.inputRoot,
-                  }}
-                  className={classes.inputs}
-                  name="avatar"
-                  onChange={handlePhotoInput}
-                  inputProps={{ type: "file", accept: "image/png, image/jpeg", id:"avatar" }}           
-                />
-                
-
-              </div>
-            </Grid>
+            <AvatarForm 
+              src={localImageURL ||  authStates.avatar}
+              alt="profile picture"
+              name="avatar"
+              formik={formik}
+            />
           </Grid>
 
-          {/** Inputs **/}
+          {/*** Inputs ***/}
           <Grid item container direction="column" justify="center" xs={8}>
-            {/* Name */}
-            <Grid item container justify="space-between" alignItems="center">
-              <input
-                className={classes.input}
-                type="text"
+            
+            {/**** Name ****/}
+            <Grid item container justify="space-between" alignItems="center">      
+              <InputForm 
+                type="text" 
                 name="name"
-                autoComplete="off"
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                value={formik.values.name}
-                placeholder=" NewName"
-              ></input>
-              {formik.touched.name && formik.errors.name ? (
-                <Typography className={classes.errorFeedback}>
-                  {formik.errors.name}
-                </Typography>
-              ) : null}
+                placeholder="New name"
+                formik={formik}
+              />
             </Grid>
 
-            {/* Lastname */}
-            <Grid item container justify="space-between" alignItems="center">
-              <input
-                className={classes.input}
-                type="text"
+            {/**** Lastname ****/}
+            <Grid item container justify="space-between" alignItems="center">     
+              <InputForm 
+                type="text" 
                 name="lastname"
-                autoComplete="off"
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                value={formik.values.lastname}
-                placeholder=" New Lastname"
-              ></input>
-              {formik.touched.lastname && formik.errors.lastname ? (
-                <Typography className={classes.errorFeedback}>
-                  {formik.errors.lastname}
-                </Typography>
-              ) : null}
+                placeholder="New Lastname"
+                formik={formik}
+              />
             </Grid>
 
-            {/* Phone */}
+            {/**** Phone ****/}
             <Grid item container justify="space-between" alignItems="center">
-              <input
-                className={classes.input}
-                type="text"
+              <InputForm 
+                type="text" 
                 name="phone"
-                autoComplete="off"
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                value={formik.values.phone}
-                placeholder=" New Phone"
-              ></input>
-              {formik.touched.phone && formik.errors.phone ? (
-                <Typography className={classes.errorFeedback}>
-                  {formik.errors.phone}
-                </Typography>
-              ) : null}
+                placeholder="New phone"
+                formik={formik}
+              />
             </Grid>
+          
           </Grid>
         </Grid>
 
         {/* Change Button */}
-        <Button 
-            color="primary"
-            variant="outlined"
-            type="submit"
-            className={classes.btnChange}
-            >
-            {responseUpdateUserInfo.loading 
-              ? 
-              <CircularProgress color="secondary" />
-              : 
-              "Change Account Info"
-            }
-          </Button>
+        <ButtonForm 
+        text="Change Account Info"
+        loadingState = {responseUpdateUserInfo.loading }
+        />
       </form>
 
+      {/* Feedback & Error UI */}
       <ErrorCard
         open={errorModalOpen}
         onClose={handlerErrorModalClose}
@@ -327,15 +187,12 @@ const AccountChangeModal = ({ modalClose }) => {
         headline={"Error"}
         btnContext="Okey"
       />
-      <Snackbar
+      <FeedbackBar
         open={Boolean(
           responseUpdateUserInfo.data && !responseUpdateUserInfo.error
-        )}
-        autoHideDuration={1500}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-      >
-        <Alert severity="success">Acoount Infos Succesfully Changed</Alert>
-      </Snackbar>
+        )}        
+        message={"Account Info Succesfully Changed."}
+      />
     </Grid>
   );
 };

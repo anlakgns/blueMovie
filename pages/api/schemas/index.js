@@ -42,7 +42,7 @@ export const typeDefs = gql`
   input changeProfileInput {
     _id: ID!
     name: String
-    kidProtection:Boolean
+    kidProtection:String
     profileId: ID!
     file: Upload
     lastModified: String

@@ -5,12 +5,9 @@ import Image from "next/image";
 import { useMutation } from "@apollo/client";
 
 import { Typography } from "@material-ui/core";
-import { Button } from "@material-ui/core";
 import Grid from "@material-ui/core/Grid";
 import { makeStyles } from "@material-ui/styles";
-import Snackbar from "@material-ui/core/Snackbar";
 import MuiAlert from "@material-ui/lab/Alert";
-import CircularProgress from "@material-ui/core/CircularProgress";
 import { InputLabel } from '@material-ui/core';
 import EditIcon from "@material-ui/icons/Edit";
 import Input from "@material-ui/core/Input";
@@ -18,6 +15,11 @@ import Input from "@material-ui/core/Input";
 import { CHANGE_PROFILE } from "../../../../shared/apolloRequests";
 import { AuthContext } from "../../../../shared/contexts/AuthContext";
 import ErrorCard from "../../../../shared/UI Components/ErrorCard";
+import ButtonForm from "../../../../shared/UI Components/ButtonForm"
+import FeedbackBar from "../../../../shared/UI Components/FeedbackBar"
+import InputForm from "../../../../shared/UI Components/InputForm"
+import AvatarForm from "../../../../shared/UI Components/AvatarForm";
+
 
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -36,48 +38,6 @@ const useStyles = makeStyles((theme) => ({
     fontWeight: "bold",
     marginBottom: "1em",
   },
-  lineGrid: {
-    padding: "0.2em",
-    paddingLeft: "1em",
-    paddingRight: "1em",
-    backgroundColor: theme.palette.common.weakBlack,
-    margin: "0.5em 0em",
-    borderRadius: "1em",
-  },
-  lineText: {
-    fontWeight: "bold",
-  },
-  btnChange: {
-    color: "white",
-    width: "15em",
-    marginTop: "2em",
-    marginBottom: "2em",
-    [theme.breakpoints.down("md")]: {
-      width: "12em",
-    },
-  },
-  avatar: {
-    borderRadius: "50%",
-  },
-  input: {
-    width: "100%",
-    borderRadius: "1em",
-    backgroundColor: theme.palette.common.weakBlack,
-    outline: "none",
-    border: "none",
-    padding: "0.2em",
-    paddingLeft: "1em",
-    paddingRight: "1em",
-    margin: "0.5em 0em",
-    height: "30px",
-    color: theme.palette.common.textWhite,
-    fontWeight: "bold",
-    "&::placeholder": {
-      color: theme.palette.common.textWhite,
-      fontWeight: "bold",
-      opacity: 0.7,
-    },
-  },
   checkboxGrid: {
     backgroundColor: theme.palette.common.purple,
     borderRadius: "1em",
@@ -91,43 +51,6 @@ const useStyles = makeStyles((theme) => ({
     height: "20px",
     padding: "1em",
     width: "20%",
-  },
-  avatar: {
-    borderRadius: "50%",
-    overflow: "hidden",
-  },
-  editIcon: {
-    position: "absolute",
-    overflow: "hidden",
-    bottom: 0,
-    color: theme.palette.common.purple,
-    backgroundColor: theme.palette.common.weakBlack,
-    width: "100%",
-    margin: "auto",
-    height: "0px",
-    textAlign: "center",
-  },
-  inputRoot:{
-    display:"none"
-  },
-  inputLabel:{
-    cursor:"pointer"
-  },
-  avatarGrid: {
-    borderRadius: "50%",
-    height: "150px",
-    maxWidth: "150px",
-    overflow: "hidden",
-    position: "relative",
-    "&:hover": {
-      "& $editIcon": {
-        color: "purple",
-        height: "40px",
-        paddingTop: "0.4em",
-        transition: "height 1s ease",
-      },
-    },
-
   },
 }));
 
@@ -154,7 +77,6 @@ const ProfileChangeModal = ({ modalClose, profil }) => {
       setModalContext(err.message);
     },
   });
-
   const formik = useFormik({
     initialValues: {
       name: "",
@@ -166,17 +88,16 @@ const ProfileChangeModal = ({ modalClose, profil }) => {
       kidProtection: Yup.boolean(),
       avatar: Yup.string(),
     }),
-
     onSubmit: (values) => {
       changeProfile({
         variables: {
           fields: {
             _id: authStates.userId,
             profileId: profil._id,
-            name: values.name || profil.name,
-            kidProtection: values.kidProtection || profil.kidProtection,
-            file: values.avatar || profil.avatar,
-            lastModified: values.avatar?.lastModified?.toString() || null
+            name: values.name,
+            kidProtection: values.kidProtection,
+            file: values.avatar,
+            lastModified: values.avatar?.lastModified?.toString() 
           },
         },
       });
@@ -203,72 +124,41 @@ const ProfileChangeModal = ({ modalClose, profil }) => {
 
   return (
     <Grid item container className={classes.main} direction="column">
+      
       {/* Headline */}
       <Grid item>
         <Typography className={classes.headline}>Change Profile</Typography>
       </Grid>
 
+      {/* Form */}
       <form onSubmit={formik.handleSubmit}>
-        {/* Avatar & Inputs */}
+        
+        {/** Avatar & Inputs **/}
         <Grid item container direction="row">
           
-          {/** Avatar **/}
+          {/*** Avatar ***/}
           <Grid item container xs={4}>
-              <Grid
-                  item
-                  container
-                  justify="center"
-                  className={classes.avatarGrid}
-                >
-                  <Image
-                    className={classes.avatar}
-                    src={localImageURL || profil.avatar || "/images/DefaultProfil.svg"}
-                    alt="profile picture"
-                    width={150}
-                    height={150}
-                  />
-                  <div className={classes.editIcon}>
-                    <InputLabel htmlFor="avatar" focused={true} className={classes.inputLabel}>
-                        <EditIcon />
-                    </InputLabel>
-                    <Input
-                      classes={{
-                        input: classes.inputRoot,
-                      }}
-                      className={classes.inputs}
-                      name="avatar"
-                      onChange={(event) => {
-                        formik.setFieldValue("avatar", event.currentTarget.files[0]);
-                      }}
-                      inputProps={{ type: "file", accept: "image/png, image/jpeg", id:"avatar" }}           
-                    />
-                    
-                  </div>
-                </Grid>
+            <AvatarForm 
+              src={localImageURL || profil.avatar || "/images/DefaultProfil.svg"}
+              alt="profile picture"
+              name="avatar"
+              formik={formik}
+            />
           </Grid>
 
-          {/** Inputs **/}
+          {/*** Inputs ***/}
           <Grid item container direction="column" justify="center" xs={8}>
-            {/* Name */}
-            <Grid item container justify="space-between" alignItems="center">
-              <input
-                className={classes.input}
+            {/**** Name ****/}
+            <Grid item> 
+              <InputForm 
                 type="text"
                 name="name"
-                autoComplete="off"
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                value={formik.values.name}
                 placeholder="New Name"
-              ></input>
-              {formik.touched.name && formik.errors.name ? (
-                <Typography className={classes.errorFeedback}>
-                  {formik.errors.name}
-                </Typography>
-              ) : null}
+                formik={formik}
+              />
             </Grid>
 
-            {/* Kid Protection */}
+            {/**** Kid Protection ****/}
             <Grid
               item
               container
@@ -276,7 +166,7 @@ const ProfileChangeModal = ({ modalClose, profil }) => {
               alignItems="center"
               className={classes.checkboxGrid}
             >
-              <label for="kidProtection" className={classes.checkboxLabel}>
+              <label htmlFor="kidProtection" className={classes.checkboxLabel}>
                 Kid Protection
               </label>
               <input
@@ -284,6 +174,7 @@ const ProfileChangeModal = ({ modalClose, profil }) => {
                 type="checkbox"
                 name="kidProtection"
                 autoComplete="off"
+                checked={formik.values.kidProtection !== "" ? formik.values.kidProtection :  profil.kidProtection}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
                 value={formik.values.kidProtection}
@@ -297,21 +188,14 @@ const ProfileChangeModal = ({ modalClose, profil }) => {
           </Grid>
         </Grid>
 
-        {/* Change Button */}
-        <Button
-          color="primary"
-          variant="outlined"
-          type="submit"
-          className={classes.btnChange}
-        >
-          {responseChangeProfile.loading ? (
-            <CircularProgress color="secondary" />
-          ) : (
-            "Change Profile"
-          )}
-        </Button>
+        {/** Change Button **/}
+        <ButtonForm 
+          text="Change Profil"
+          loadingState = {responseChangeProfile.loading}
+        />
       </form>
 
+      {/* Feedback & Error UI */}
       <ErrorCard
         open={errorModalOpen}
         onClose={handlerErrorModalClose}
@@ -319,15 +203,14 @@ const ProfileChangeModal = ({ modalClose, profil }) => {
         headline={"Error"}
         btnContext="Okey"
       />
-      <Snackbar
-        open={Boolean(
-          responseChangeProfile.data && !responseChangeProfile.error
-        )}
-        autoHideDuration={1500}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-      >
-        <Alert severity="success">Profile Succesfully Changed.</Alert>
-      </Snackbar>
+      <FeedbackBar
+        open = {
+          Boolean(
+          responseChangeProfile.data && !responseChangeProfile.error)
+        }
+        message={"Profile Succesfully Changed."}
+      />
+      
     </Grid>
   );
 };

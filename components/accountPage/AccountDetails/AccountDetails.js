@@ -18,7 +18,6 @@ const useStyles = makeStyles(theme => ({
   }
 }))
 
-
 const AccountDetails = () => {
   const classes = useStyles()
 

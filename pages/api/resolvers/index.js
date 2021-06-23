@@ -508,6 +508,7 @@ export const resolvers = {
         if (!ownerCheck) {
           throwAuthError("You don't have this user.");
         }
+        console.log(args.fields)
 
         // User Exist Check
         const user = await User.findOne({ _id: id });
@@ -515,7 +516,7 @@ export const resolvers = {
           throwAuthError("Sorry user couldn't found. Please try again.");
         }
 
-        // Adding to Profile
+        // Deleting Profile
         const newProfiles = user.profiles.filter(profile => profile.name !== args.fields.name)
         user.profiles = newProfiles
 
@@ -524,6 +525,7 @@ export const resolvers = {
 
         return { profiles: data.profiles };
       } catch (err) {
+        console.log(err)
         throw err;
       }
     },
@@ -536,19 +538,16 @@ export const resolvers = {
           throwAuthError("You don't have this user.");
         }
 
-         // User Exist Check
-         const user = await User.findOne({ _id: id });
-         if (!user) {
-           throwAuthError("Sorry user couldn't found. Please try again.");
-         }
+        // User Exist Check
+        const user = await User.findOne({ _id: id });
+        if (!user) {
+          throwAuthError("Sorry user couldn't found. Please try again.");
+        }
 
-         console.log(user.profiles)
-         console.log(args.fields)
-        // Updating Profile
+        // Finding Profile
         const profileIndex = user.profiles.findIndex(profile => profile._id.toString() === args.fields.profileId
         )
      
-
         // Check Profile
         if (profileIndex === -1) {
           throwAuthError("Profile couldn't found.");
@@ -581,11 +580,18 @@ export const resolvers = {
          )
         }
         
-
-        user.profiles[profileIndex].name = args.fields.name
-        user.profiles[profileIndex].kidProtection = args.fields.kidProtection
-        user.profiles[profileIndex].avatar = args.fields.file ? `https://firebasestorage.googleapis.com/v0/b/bluemovie-2eaeb.appspot.com/o/${user.email.replace("@", "%40")}-profil%3Flastmod%3D${args.fields.lastModified}%3FprofilName%3D${args.fields.name}?alt=media&token=ca440441-89d3-4f14-a8c0-f2a226c208a9`
-          : null
+        console.log(args.fields)
+        // Saving to User
+        if(args.fields.kidProtection !== "") {
+          user.profiles[profileIndex].kidProtection = args.fields.kidProtection
+        }
+        if(args.fields.name) {
+          user.profiles[profileIndex].name = args.fields.name
+        }        
+        if(args.fields.file) {
+          user.profiles[profileIndex].avatar =
+          `https://firebasestorage.googleapis.com/v0/b/bluemovie-2eaeb.appspot.com/o/${user.email.replace("@", "%40")}-profil%3Flastmod%3D${args.fields.lastModified}%3FprofilName%3D${args.fields.name}?alt=media&token=ca440441-89d3-4f14-a8c0-f2a226c208a9`
+        }
         
 
         // Saving to DB

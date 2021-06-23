@@ -5,22 +5,17 @@ import Image from "next/image";
 import { useMutation } from "@apollo/client"
 
 import { Typography } from "@material-ui/core"
-import { Button } from "@material-ui/core"
 import Grid from "@material-ui/core/Grid"
 import {makeStyles} from "@material-ui/styles"
-import Snackbar from '@material-ui/core/Snackbar';
-import MuiAlert from '@material-ui/lab/Alert';
-import CircularProgress from "@material-ui/core/CircularProgress";
 import Input from "@material-ui/core/Input";
 import { InputLabel } from '@material-ui/core';
+import FeedbackBar from "../../../../shared/UI Components/FeedbackBar";
+import InputForm from "../../../../shared/UI Components/InputForm";
+import ButtonForm from "../../../../shared/UI Components/ButtonForm";
 
 import {ADD_PROFILE} from "../../../../shared/apolloRequests"
 import { AuthContext } from "../../../../shared/contexts/AuthContext";
 import ErrorCard from "../../../../shared/UI Components/ErrorCard";
-
-function Alert(props) {
-  return <MuiAlert elevation={6} variant="filled" {...props} />;
-}
 
 const useStyles = makeStyles(theme => ({
   main: {
@@ -34,48 +29,6 @@ const useStyles = makeStyles(theme => ({
     fontSize:"1.5em",
     fontWeight:"bold",
     marginBottom:"1em"
-  },
-  lineGrid:{
-    padding:"0.2em",
-    paddingLeft:"1em",
-    paddingRight:"1em",
-    backgroundColor: theme.palette.common.weakBlack,
-    margin:"0.5em 0em",
-    borderRadius:"1em",
-  },
-  lineText:{
-    fontWeight:"bold"
-  },
-  btnChange: {
-   color: "white",
-   width:"15em",
-   marginTop:"2em",
-   marginBottom:"2em",
-   [theme.breakpoints.down("md")]: {
-     width: "12em"
-   }
-  },
-  avatar: {
-
-  },
-  input:{
-    width:"100%",
-    borderRadius:"1em",
-    backgroundColor: theme.palette.common.weakBlack,
-    outline:"none",
-    border:"none",
-    padding:"0.2em",
-    paddingLeft:"1em",
-    paddingRight:"1em",
-    margin:"0.5em 0em",
-    height:"30px",
-    color: theme.palette.common.textWhite,
-    fontWeight:"bold",
-    "&::placeholder": {
-      color: theme.palette.common.textWhite,
-      fontWeight:"bold",
-      opacity:0.7
-    }
   },
   checkboxGrid:{
     backgroundColor: theme.palette.common.purple,
@@ -92,12 +45,6 @@ const useStyles = makeStyles(theme => ({
     width:"20%"
 
   },
-  inputRoot:{
-    display:"none"
-  },
-  inputLabel: {
-    cursor:"pointer",
-  }
 }))
 
 const ProfileAddModal = ({modalClose}) => {
@@ -123,7 +70,6 @@ const ProfileAddModal = ({modalClose}) => {
       setModalContext(err.message)
     }
   })
-
   const formik = useFormik({
     initialValues: {
       name:"",
@@ -173,8 +119,6 @@ const ProfileAddModal = ({modalClose}) => {
     setErrorModalOpen(false);
   };
 
-  
-
 
   return (
     <Grid 
@@ -189,6 +133,7 @@ const ProfileAddModal = ({modalClose}) => {
         </Typography>
       </Grid>
 
+      {/* Form */}
       <form onSubmit={formik.handleSubmit} >
   
         {/* Avatar & Inputs */}
@@ -202,7 +147,6 @@ const ProfileAddModal = ({modalClose}) => {
             xs={4} 
             justify="center"
           >
-              
                 <InputLabel 
                   htmlFor="avatar" 
                   focused={true} 
@@ -225,7 +169,7 @@ const ProfileAddModal = ({modalClose}) => {
                     formik.setFieldValue("avatar", event.currentTarget.files[0]);
                   }}
                   inputProps={{ type: "file", accept: "image/png, image/jpeg", id:"avatar" }}           
-                />
+                />   
           </Grid>
   
           {/** Inputs **/}
@@ -240,22 +184,12 @@ const ProfileAddModal = ({modalClose}) => {
                item container
                justify="space-between"
                alignItems="center">
-       
-               <input 
-                 className={classes.input}
-                 type="text"
-                 name="name"
-                 autoComplete="off"
-                 onChange={formik.handleChange}
-                 onBlur={formik.handleBlur}
-                 value={formik.values.name}
-                 placeholder="Name">
-               </input>
-               {formik.touched.name && formik.errors.name ? (
-                     <Typography className={classes.errorFeedback}>
-                       {formik.errors.name}
-                     </Typography>
-               ) : null}
+                <InputForm 
+                  type="text" 
+                  name="name"
+                  placeholder="Name"
+                  formik={formik}
+                />
              </Grid>
   
              {/* Kid Protection */}
@@ -292,22 +226,14 @@ const ProfileAddModal = ({modalClose}) => {
         </Grid>
       
         {/* Change Button */}
-        <Button 
-            color="primary"
-            variant="outlined"
-            type="submit"
-            className={classes.btnChange}
-            >
-            {responseAddProfile.loading 
-              ? 
-              <CircularProgress color="secondary" />
-              : 
-              "Add Profile"
-            }
-          </Button>
+        <ButtonForm 
+          text="Add Profile"
+          loadingState = {responseAddProfile.loading}
+        />
     
       </form>
       
+      {/* Feedback & Error UI */}
       <ErrorCard
         open={errorModalOpen}
         onClose={handlerErrorModalClose}
@@ -315,20 +241,12 @@ const ProfileAddModal = ({modalClose}) => {
         headline={"Error"}
         btnContext="Okey"
       />
-      <Snackbar 
+      <FeedbackBar
         open={Boolean(responseAddProfile.data && !responseAddProfile.error)} 
-        autoHideDuration={1500} 
-        anchorOrigin={{ vertical: "top", horizontal:"center" }}
-        >
-        <Alert  severity="success">
-          Profile Succesfully Added.
-        </Alert>
-      </Snackbar>
+        message={"Profile Succesfully Added."}
+      />
     
     </Grid>
-
-
-    
   )
 }
 

@@ -8,16 +8,11 @@ import { makeStyles } from "@material-ui/styles";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
 import ErrorCard from "../../../../shared/UI Components/ErrorCard";
-import Snackbar from "@material-ui/core/Snackbar";
-import MuiAlert from "@material-ui/lab/Alert";
 import CircularProgress from "@material-ui/core/CircularProgress";
+import FeedbackBar from "../../../../shared/UI Components/FeedbackBar";
 
 import { AuthContext } from "../../../../shared/contexts/AuthContext";
 import { CHANGE_PLAN } from "../../../../shared/apolloRequests";
-
-function Alert(props) {
-  return <MuiAlert elevation={6} variant="filled" {...props} />;
-}
 
 const useStyles = makeStyles((theme) => ({
   main: {
@@ -123,6 +118,7 @@ const ProfileChangeModal = ({ modalClose }) => {
 
   return (
     <Grid item container className={classes.main} direction="column">
+      
       {/* Headline */}
       <Grid item>
         <Typography className={classes.headline}>Plan Change</Typography>
@@ -244,7 +240,8 @@ const ProfileChangeModal = ({ modalClose }) => {
           "Change Plan"
         }
       </Button>
-
+      
+      {/* Feedback & Error UI */}
       <ErrorCard
         open={errorModalOpen}
         onClose={handlerErrorModalClose}
@@ -252,13 +249,11 @@ const ProfileChangeModal = ({ modalClose }) => {
         headline={"Error"}
         btnContext="Okey"
       />
-      <Snackbar
+      <FeedbackBar
         open={Boolean(responseChangePlan.data && !responseChangePlan.error)}
-        autoHideDuration={1500}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-      >
-        <Alert severity="success">Plan Succesfully Changed</Alert>
-      </Snackbar>
+        message={"Plan Succesfully Changed."}
+      />
+
     </Grid>
   );
 };
