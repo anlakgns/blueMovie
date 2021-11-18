@@ -108,6 +108,8 @@ const AuthForm = () => {
       setModalContext(error.message);
     },
   });
+
+  
   const formik = useFormik({
     initialValues: {
       name: "",

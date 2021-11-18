@@ -45,6 +45,9 @@ const useStyles = makeStyles(theme => ({
     width:"20%"
 
   },
+  inputRoot:{
+    display:"none"
+  },
 }))
 
 const ProfileAddModal = ({modalClose}) => {

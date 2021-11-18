@@ -72,7 +72,8 @@ const EmailChange = ({modalClose}) => {
       newEmail: Yup
         .string()
         .email("Invalid Email")
-        .required("Please provide your new email."),
+        .required("Please provide your new email.")
+        .notOneOf([Yup.ref("currentEmail")], "Please provide a new email."),
       confirmEmail: Yup
         .string()
         .email("Invalid Email")

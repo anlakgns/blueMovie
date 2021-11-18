@@ -60,10 +60,11 @@ const PasswordChangeModal = ({modalClose}) => {
       newPassword: Yup
         .string()
         .min(4, "Must be more than 3 characters.")
-        .required("Sorry the new password is required."),
+        .required("Sorry the new password is required.")
+        .notOneOf([Yup.ref("currentPassword")], "Please provide a new password"),
       confirmNewPassword: Yup
         .string()
-        .required("Please provide your new email")
+        .required("Please provide your new password")
         .min(4, "Must be more than 3 characters.")
         .oneOf([Yup.ref("newPassword")], "New passwords should match")
     }),

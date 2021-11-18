@@ -8,18 +8,17 @@ import { Typography } from "@material-ui/core";
 import Grid from "@material-ui/core/Grid";
 import { makeStyles } from "@material-ui/styles";
 import MuiAlert from "@material-ui/lab/Alert";
-import { InputLabel } from '@material-ui/core';
+import { InputLabel } from "@material-ui/core";
 import EditIcon from "@material-ui/icons/Edit";
 import Input from "@material-ui/core/Input";
 
 import { CHANGE_PROFILE } from "../../../../shared/apolloRequests";
 import { AuthContext } from "../../../../shared/contexts/AuthContext";
 import ErrorCard from "../../../../shared/UI Components/ErrorCard";
-import ButtonForm from "../../../../shared/UI Components/ButtonForm"
-import FeedbackBar from "../../../../shared/UI Components/FeedbackBar"
-import InputForm from "../../../../shared/UI Components/InputForm"
+import ButtonForm from "../../../../shared/UI Components/ButtonForm";
+import FeedbackBar from "../../../../shared/UI Components/FeedbackBar";
+import InputForm from "../../../../shared/UI Components/InputForm";
 import AvatarForm from "../../../../shared/UI Components/AvatarForm";
-
 
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -59,7 +58,7 @@ const ProfileChangeModal = ({ modalClose, profil }) => {
   const { authStates, setAuthStates } = useContext(AuthContext);
   const [errorModalOpen, setErrorModalOpen] = useState(false);
   const [modalContext, setModalContext] = useState("");
-  const [localImageURL, setLocalImageURL] = useState("")
+  const [localImageURL, setLocalImageURL] = useState("");
   const [changeProfile, responseChangeProfile] = useMutation(CHANGE_PROFILE, {
     onCompleted: (data) => {
       setAuthStates((prev) => {
@@ -84,9 +83,9 @@ const ProfileChangeModal = ({ modalClose, profil }) => {
       avatar: "",
     },
     validationSchema: Yup.object({
-      name: Yup.string(),
+      name: Yup.string().trim(),
       kidProtection: Yup.boolean(),
-      avatar: Yup.string(),
+      avatar: Yup.string().trim(),
     }),
     onSubmit: (values) => {
       changeProfile({
@@ -97,7 +96,7 @@ const ProfileChangeModal = ({ modalClose, profil }) => {
             name: values.name,
             kidProtection: values.kidProtection,
             file: values.avatar,
-            lastModified: values.avatar?.lastModified?.toString() 
+            lastModified: values.avatar?.lastModified?.toString(),
           },
         },
       });
@@ -106,16 +105,16 @@ const ProfileChangeModal = ({ modalClose, profil }) => {
 
   // Image Upload Preview
   useEffect(() => {
-    let result
-    if(formik.values.avatar) {
-    const reader = new FileReader()
-    reader.onload = function() {
-      result = reader.result
-      setLocalImageURL(result)
+    let result;
+    if (formik.values.avatar) {
+      const reader = new FileReader();
+      reader.onload = function () {
+        result = reader.result;
+        setLocalImageURL(result);
+      };
+      reader.readAsDataURL(formik.values.avatar);
     }
-    reader.readAsDataURL(formik.values.avatar)
-    }
-  },[formik.values.avatar])
+  }, [formik.values.avatar]);
 
   // Dom Handlers
   const handlerErrorModalClose = () => {
@@ -124,7 +123,6 @@ const ProfileChangeModal = ({ modalClose, profil }) => {
 
   return (
     <Grid item container className={classes.main} direction="column">
-      
       {/* Headline */}
       <Grid item>
         <Typography className={classes.headline}>Change Profile</Typography>
@@ -132,14 +130,14 @@ const ProfileChangeModal = ({ modalClose, profil }) => {
 
       {/* Form */}
       <form onSubmit={formik.handleSubmit}>
-        
         {/** Avatar & Inputs **/}
         <Grid item container direction="row">
-          
           {/*** Avatar ***/}
           <Grid item container xs={4}>
-            <AvatarForm 
-              src={localImageURL || profil.avatar || "/images/DefaultProfil.svg"}
+            <AvatarForm
+              src={
+                localImageURL || profil.avatar || "/images/DefaultProfil.svg"
+              }
               alt="profile picture"
               name="avatar"
               formik={formik}
@@ -149,8 +147,8 @@ const ProfileChangeModal = ({ modalClose, profil }) => {
           {/*** Inputs ***/}
           <Grid item container direction="column" justify="center" xs={8}>
             {/**** Name ****/}
-            <Grid item> 
-              <InputForm 
+            <Grid item>
+              <InputForm
                 type="text"
                 name="name"
                 placeholder="New Name"
@@ -174,7 +172,11 @@ const ProfileChangeModal = ({ modalClose, profil }) => {
                 type="checkbox"
                 name="kidProtection"
                 autoComplete="off"
-                checked={formik.values.kidProtection !== "" ? formik.values.kidProtection :  profil.kidProtection}
+                checked={
+                  formik.values.kidProtection !== ""
+                    ? formik.values.kidProtection
+                    : profil.kidProtection
+                }
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
                 value={formik.values.kidProtection}
@@ -189,9 +191,9 @@ const ProfileChangeModal = ({ modalClose, profil }) => {
         </Grid>
 
         {/** Change Button **/}
-        <ButtonForm 
+        <ButtonForm
           text="Change Profil"
-          loadingState = {responseChangeProfile.loading}
+          loadingState={responseChangeProfile.loading}
         />
       </form>
 
@@ -204,13 +206,11 @@ const ProfileChangeModal = ({ modalClose, profil }) => {
         btnContext="Okey"
       />
       <FeedbackBar
-        open = {
-          Boolean(
-          responseChangeProfile.data && !responseChangeProfile.error)
-        }
+        open={Boolean(
+          responseChangeProfile.data && !responseChangeProfile.error
+        )}
         message={"Profile Succesfully Changed."}
       />
-      
     </Grid>
   );
 };

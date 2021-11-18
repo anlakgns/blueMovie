@@ -6,11 +6,6 @@ import Footer from "./Footer";
 import { ISAUTH } from "../../shared/apolloRequests";
 import { useQuery } from "@apollo/client";
 
-
-
-
-
-
 const Layout = ({ children }) => {
   const { loading, error, data } = useQuery(ISAUTH);
   const { authStates, setAuthStates } = useContext(AuthContext);
@@ -43,7 +38,6 @@ const Layout = ({ children }) => {
     }
 
   },[loading,error,data])
-console.log(authStates)
   return (
       <>
         {authStates.isAuth ? (
